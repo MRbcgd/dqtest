@@ -11,6 +11,7 @@ var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
+func_query.stat_disk();
 
 var packet = {
   head: {},
@@ -37,6 +38,26 @@ socket.on('stat_info_ma', function (message) {
   }
 
   socket.emit('stat_info_am', packet);
+  console.log('####################'); console.log('Send packet to master'); console.log(packet);
+});
+socket.on('stat_disk_ma', function (message) {
+  console.log('####################');
+  console.log('Receive packet from master: DQ- stat_disk event');//DIRECT QUERY
+  console.log(message);
+
+  packet.head.svrkey = session.svrkey;
+  packet.head.login_token = message.head.login_token;
+  packet.head.query_type = message.head.query_type;
+  packet.head.svccd = message.head.svccd;
+
+  if (message.head.dstkey !== session.svrkey) {
+    packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
+  } else {
+    packet.error.code = 0; packet.error.mesg = 'Correct packet data';
+    packet.output = func_query();//DISK - FILESYSTEM
+  }
+
+  socket.emit('stat_disk_am', packet);
   console.log('####################'); console.log('Send packet to master'); console.log(packet);
 });
 //DATACAPTURE

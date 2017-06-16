@@ -29,31 +29,31 @@ io.sockets.on('connection', function(socket) {
   });
 
   //DIRECT QUERY WEB TO MASTER: SYSTEM INFORMATION
-  socket.on('stat_info_wm', function (message) {
+  socket.on('stat_disk_wm', function (message) {
     console.log('####################'); console.log('Receive packet from web'); console.log(message);
 
     console.log('####################');
     if ( message.head.dstkey === dstkey ) {//@@@@@@@@@@ UPDATE SOON MULTI AGENT
-      io.sockets.in(dstkey).emit('stat_info_ma', message);
+      io.sockets.in(dstkey).emit('stat_disk_ma', message);
 
       console.log('Send packet to agent');
     } else {
       message.error.code = 0; message.error.mesg = 'Incorrect packet data';
-      io.sockets.in('web_socketid').emit('stat_info_mw', message);
+      io.sockets.in('web_socketid').emit('stat_disk_mw', message);
 
       console.log('Send packet to web: ERR- SEND BACK');
     };
     console.log(message);
   });
   //DIRECT QUERY AGENT TO MASTER:
-  socket.on('stat_info_am', function (message) {
+  socket.on('stat_disk_am', function (message) {
     console.log('####################'); console.log('Receive packet from agent');
     console.log(message);
 
     if ( message.head.svrkey === svrkey ) {
-      io.sockets.in('web_socketid').emit('stat_info_mw', message);
+      io.sockets.in('web_socketid').emit('stat_disk_mw', message);
 
-      console.log('Send packet to web');
+      console.log('Send packet to web');console.log(mesage);
     } else {
       message.error.code = 0; message.error.mesg = 'Incorrect packet data';
       io.sockets.in(svrkey).emit('stat_info_ma', message);

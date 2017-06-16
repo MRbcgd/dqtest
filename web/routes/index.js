@@ -100,10 +100,8 @@ router.get('/stat_info', function(req, res) {
       else {
         console.log('####################'); console.log('Query sucess');
 
-        // res.render('stat_info.ejs');
+       res.render('stat_info.ejs');
         console.log(message);
-
-
       }
     });
 
@@ -212,10 +210,44 @@ router.get('/usage_disk', function(req, res, next) {
 router.get('/stat_disk', function(req, res, next) {
   var sess = req.session;
 
+  packet = {
+    head: {
+      login_token : req.session.login_token,
+      svccd : 'stat_disk',
+      query_type : 'direct',
+      dstkey: req.session.dstkey
+    },
+    input: null
+  };
+
   if (sess.username) {
-    res.render('stat_disk.ejs', {
-      username: sess.username
+
+    socket.emit('stat_disk_wm', packet);//DIRECT QUERY WEB TO MASTER
+    console.log('#####################'); console.log('Send packet to master'); console.log(packet);
+
+    socket.on('stat_disk_mw', function (message) {
+      console.log('#####################'); console.log('Receive packet from master'); console.log(message);
+      if ( message.head.login_token !== req.session.login_token ) {
+        console.log('Incorrect login token: ERR- SESSION DESTROY');
+
+        req.session.destroy(function(err){
+         if (err) {
+           throw err;
+         }
+         res.redirect('/')
+       });
+      }
+      else if ( message.error.code !== 0 ) {
+        socket.emit('stat_disk_wm', packet); console.log('Send packet to master: ERR- REPRESENT');
+      }
+      else {
+        console.log('####################'); console.log('Query sucess');
+
+        res.render('stat_info.ejs');
+        console.log(message);
+      }
     });
+
   } else {
     res.redirect('/');
   }
