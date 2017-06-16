@@ -1,58 +1,45 @@
-var http = require('http'),
-io = require('socket.io');
+var http = require('http');
+var ip = require('ip');
+var io = require('socket.io');
+var session = require('express-session');
 
-// Create server & socket
+const port = 52273;
+const host ='127.0.0.1';
+const dstkey = '9525!@#!$#^&*&^%$DFGHJ#@!#$NN651%@';
+const svrkey = 'a52ER2###@DFDDQQ$FBPF!#)(*<NSam%T%GdDF)';
 var server = http.createServer();
-server.listen(52273);
+
+server.listen(port, function () {
+  console.log('Server Running at http://' + host + ':' + port);
+});
 io = io.listen(server);
 
-// Add a connect listener
-io.sockets.on('connection', function(socket)
-{
-  console.log('Client connected.');
+var func_socket = require('./func_socket.js');
 
-  socket.on('am',function(data){
-    console.log(data);
-    socket.emit('ma', {data:'ma'});
-  })
-  // Disconnect listener
-  socket.on('disconnect', function() {
-  console.log('Client disconnected.');
+io.sockets.on('connection', function(socket) {
+  console.log('The socket network is connected');
+
+  func_socket.ip_check(socket);//IP CHECK
+
+  socket.on('join', function (message) {
+    console.log('Socket room created');
+    socket.join(message)//PRIVATE COMMUNICATION
   });
+
+  //PRIVATE COMMUNICATION
+  socket.on('stat_info_wm', function (message) {
+    console.log('Receive packet');
+
+    if ( message.input.dstkey === dstkey ) {
+      io.sockets.in(svrkey).emit('stat_info_ma', message);
+      console.log('Send packet to agent');
+    };
+
+  });
+
+  //DISCONNECT
+  socket.on('disconnect', function() {
+    console.log('Client disconnected');
+  });
+
 });
-
-
-
-
-// var express = require('express');
-// var http = require('http');
-//
-// var socket = require('socket.io')(http);
-//
-// var app = express();
-//
-// http.listen(52273, function(){
-//   console.log('server running at 52273');
-// });
-//
-//
-// socket.on('connection', function () {
-//   console.log('web server 또는 client에서 접속시도가 있습니다.');
-//
-//   // socket.on('dc_master2agent', function (data) {
-//   //   console.log('master에서 수신했으며 이 데이터는 agent에서 보내온 데이터 캡쳐에 대한 성공여부입니다.');
-//   // });
-//   //
-//   // socket.on('dq_web2master', function (data) {
-//   //   console.log('master에서 수신했으며 이 데이터는 web에서 보내온 direct query입니다.');
-//   //
-//   //   socket.emit('dq_master2agent',{ data : 'data'}); //추후에 idsc를 위하여 id로 구분해줌.
-//   // });
-//   //
-//   // socket.on('dq_agent2master', function (data) {
-//   //   console.log('master에서 수신했으며 이 데이터는 agent에서 보내온 direct query의 결과 값입니다.');
-//   //
-//   //   socket.emit('dq_master2web', { data : 'datacaputure 성공적으로 도착했습니다.'});
-//   // });
-//
-// });

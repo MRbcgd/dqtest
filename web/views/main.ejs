@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Server Monitoring</title>
+
+
+  <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+
+    <link rel="stylesheet" href="stylesheets/style.css">
+
+
+</head>
+
+<body>
+  <div id="wrapper" >
+  <!-- Sidebar -->
+  <div id="sidebar-wrapper">
+    <% include ./menu.ejs%>
+  </div>
+  <!-- Page Content -->
+  <div class="page-content-wrapper">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <a href="#" class="btn btn-primary" id="menu-toggle">Menu</a>
+          <!-- top  -->
+          <% include ./top.ejs %>
+          <p>Main</p>
+          <!--  -->
+        </div>
+        <!-- middle -->
+        <!--  -->
+      </div>
+
+      <div class="container">
+        <table class="table table-fixed">
+          <thead>
+            <tr>
+              <th class="col-xs-3">화면</th>
+              <th class="col-xs-3">Service Code</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-xs-3">System Information</td>
+              <td class="col-xs-3">stat_info</td>
+            </tr>
+
+            <tr>
+              <td class="col-xs-3">System Usage</td>
+              <td class="col-xs-3"></td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">Status</td>
+              <td class="col-xs-3">usage_status</td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">CPU</td>
+              <td class="col-xs-3"></td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">CPU</td>
+              <td class="col-xs-3">usage_cpu</td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">Processes</td>
+              <td class="col-xs-3">stat_prcs</td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">Memory</td>
+              <td class="col-xs-3">usage_mem</td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">Network</td>
+              <td class="col-xs-3"></td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">TCP</td>
+              <td class="col-xs-3">usage_tcp</td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">netstat</td>
+              <td class="col-xs-3">stat_net</td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">IPCS</td>
+              <td class="col-xs-3"></td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">Queue</td>
+              <td class="col-xs-3">stat_ipcq</td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">SHM</td>
+              <td class="col-xs-3">stat_ipcm</td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">Disk</td>
+              <td class="col-xs-3"></td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">Disk</td>
+              <td class="col-xs-3"></td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">Disk</td>
+              <td class="col-xs-3">usage_disk</td>
+            </tr>
+            <tr>
+              <td class="col-xs-3">Filesystem</td>
+              <td class="col-xs-3">stat_disk</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- bottom -->
+      <!--  -->
+    </div>
+  </div>
+
+</div>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
+
+    <script src="javascripts/index.js"></script>
+
+</body>
+</html>
