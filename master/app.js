@@ -51,12 +51,12 @@ io.sockets.on('connection', function(socket) {
     console.log(message);
 
     if ( message.head.svrkey === svrkey ) {
-      io.sockets.in('web_socketid').emit('stat_disk_mw', message);
+      io.sockets.in('web_socketid').emit('stat_disk_mw');
 
-      console.log('Send packet to web');console.log(mesage);
+      console.log('Send packet to web');console.log(message);
     } else {
       message.error.code = 0; message.error.mesg = 'Incorrect packet data';
-      io.sockets.in(svrkey).emit('stat_info_ma', message);
+      io.sockets.in(svrkey).emit('stat_disk_ma', message);
 
       console.log('Send packet to agent: ERR- SEND BACK');
     }

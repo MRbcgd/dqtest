@@ -1,5 +1,5 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/bin/nodejs', '/usr/bin/npm', 'start' ]
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'start' ]
 2 info using npm@3.10.10
 3 info using node@v6.10.2
 4 verbose run-script [ 'prestart', 'start', 'poststart' ]
@@ -7,8 +7,8 @@
 6 silly lifecycle web@0.0.0~prestart: no script for prestart, continuing
 7 info lifecycle web@0.0.0~start: web@0.0.0
 8 verbose lifecycle web@0.0.0~start: unsafe-perm in lifecycle true
-9 verbose lifecycle web@0.0.0~start: PATH: /usr/lib/node_modules/npm/bin/node-gyp-bin:/home/quittypig/dev/js/dqtest/web/node_modules/.bin:/home/quittypig/bin:/home/quittypig/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-10 verbose lifecycle web@0.0.0~start: CWD: /home/quittypig/dev/js/dqtest/web
+9 verbose lifecycle web@0.0.0~start: PATH: /usr/lib/node_modules/npm/bin/node-gyp-bin:/home/dev/project/server_monitoring/dqtest/web/node_modules/.bin:/usr/lib64/qt-3.3/bin:/home/dev/perl5/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/dev/.local/bin:/home/dev/bin
+10 verbose lifecycle web@0.0.0~start: CWD: /home/dev/project/server_monitoring/dqtest/web
 11 silly lifecycle web@0.0.0~start: Args: [ '-c', 'node ./bin/www' ]
 12 silly lifecycle web@0.0.0~start: Returned: code: 1  signal: null
 13 info lifecycle web@0.0.0~start: Failed to exec start script
@@ -23,9 +23,9 @@
 14 verbose stack     at maybeClose (internal/child_process.js:886:16)
 14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:226:5)
 15 verbose pkgid web@0.0.0
-16 verbose cwd /home/quittypig/dev/js/dqtest/web
-17 error Linux 4.8.0-54-generic
-18 error argv "/usr/bin/nodejs" "/usr/bin/npm" "start"
+16 verbose cwd /home/dev/project/server_monitoring/dqtest/web
+17 error Linux 3.10.0-514.10.2.el7.x86_64
+18 error argv "/usr/bin/node" "/usr/bin/npm" "start"
 19 error node v6.10.2
 20 error npm  v3.10.10
 21 error code ELIFECYCLE

@@ -54,7 +54,7 @@ socket.on('stat_disk_ma', function (message) {
     packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
   } else {
     packet.error.code = 0; packet.error.mesg = 'Correct packet data';
-    packet.output = func_query();//DISK - FILESYSTEM
+    packet.output = func_query.stat_disk();//DISK - FILESYSTEM
   }
 
   socket.emit('stat_disk_am', packet);
