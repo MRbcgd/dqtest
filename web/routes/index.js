@@ -64,7 +64,7 @@ router.get('/main', function(req, res, next) {
     res.redirect('/');
   }
 });
-router.get('/stat_info', function(req, res, next) {
+router.get('/stat_info', function(req, res) {
   var sess = req.session;
 
   packet = {
@@ -99,9 +99,11 @@ router.get('/stat_info', function(req, res, next) {
       }
       else {
         console.log('####################'); console.log('Query sucess');
-        res.render('stat_info.ejs', {
-          username: sess.username
-        });
+
+        // res.render('stat_info.ejs');
+        console.log(message);
+
+
       }
     });
 
