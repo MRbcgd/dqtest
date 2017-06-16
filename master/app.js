@@ -51,9 +51,9 @@ io.sockets.on('connection', function(socket) {
     console.log(message);
 
     if ( message.head.svrkey === svrkey ) {
-      io.sockets.in('web_socketid').emit('stat_disk_mw');
+      io.sockets.in('web_socketid').emit('stat_disk_mw', message);
 
-      console.log('Send packet to web');console.log(message);
+      console.log('Send packet to web'); console.log(message);
     } else {
       message.error.code = 0; message.error.mesg = 'Incorrect packet data';
       io.sockets.in(svrkey).emit('stat_disk_ma', message);

@@ -1,4 +1,4 @@
-var default_ip = '172.30.1.11';
+var default_ip = '192.168.20.128';
 
 module.exports.ip_check = function (socket) {
   //IP CHECK
