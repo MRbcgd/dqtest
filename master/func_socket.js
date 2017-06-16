@@ -1,9 +1,11 @@
+var default_ip = '192.168.20.128';
+
 module.exports.ip_check = function (socket) {
   //IP CHECK
   socket.on('ip_check', function (message) {
     var svrkey = null;
 
-    if (message.data === '192.168.195.1') {//DEFAULT IP
+    if (message.data === default_ip) {//DEFAULT IP
       console.log('Accessible IP: Agent1');
 
       svrkey = 'a52ER2###@DFDDQQ$FBPF!#)(*<NSam%T%GdDF)';

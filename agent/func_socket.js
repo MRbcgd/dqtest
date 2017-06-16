@@ -16,12 +16,13 @@ module.exports.ip_check = function (socket) {
   socket.on('ip_result', function (message) {//IP RESULT
 
     if (message.data === 'fail') {
-      console.log('Inaccessible IP: Reconnect');
-
       socket.emit('ip_check', { data: ip.address() });
+
+      console.log('Inaccessible IP: Reconnect');
     } else {
       session.svrkey = message.data;
       socket.emit('join', session.svrkey);//PRIVATE COMMUNICATION
+
       console.log('Allow access');
     };
   });

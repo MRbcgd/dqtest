@@ -6,6 +6,11 @@ var socket = require('../conn_socket.js');
 
 var router = express.Router();
 
+var pacekt = {
+  head: {},
+  input: {}
+};
+
 router.get('/', function(req, res, next) {
   var sess = req.session;
 
@@ -26,9 +31,9 @@ router.post('/signin', function(req, res, next) {
   if ( user.username !== 'test' && user.password !== 'test') {
     req.session.username = user.username;
     req.session.login_token = 'test';
-    req.session.dstkey = '9525!@#!$#^&*&^%$DFGHJ#@!#$NN651%@';
+    req.session.dstkey = 'a52ER2###@DFDDQQ$FBPF!#)(*<NSam%T%GdDF)';
 
-    socket.emit('join', req.session.dstkey);//PRIVATE COMMUNICATION
+    socket.emit('join', 'web_socketid');//PRIVATE COMMUNICATION
     console.log('');
     res.redirect('/main');
   } else {
@@ -61,22 +66,45 @@ router.get('/main', function(req, res, next) {
 });
 router.get('/stat_info', function(req, res, next) {
   var sess = req.session;
-  var packet = {
+
+  packet = {
     head: {
       login_token : req.session.login_token,
       svccd : 'stat_info',
       query_type : 'direct',
+      dstkey: req.session.dstkey
     },
-    input: { dstkey : req.session.dstkey }
+    input: null
   };
 
   if (sess.username) {
-    console.log('Send packet to master');
-    socket.emit('stat_info_wm', packet);//DIRECT QUERY WEB TO MASTER
 
-    res.render('stat_info.ejs', {
-      username: sess.username
+    socket.emit('stat_info_wm', packet);//DIRECT QUERY WEB TO MASTER
+    console.log('#####################'); console.log('Send packet to master'); console.log(packet);
+
+    socket.on('stat_info_mw', function (message) {
+      console.log('#####################'); console.log('Receive packet from master'); console.log(message);
+      if ( message.head.login_token !== req.session.login_token) {
+        console.log('Incorrect login token: ERR- SESSION DESTROY');
+
+        req.session.destroy(function(err){
+         if (err) {
+           throw err;
+         }
+         res.redirect('/')
+       });
+      }
+      else if ( message.error.code !== 0 ) {
+        socket.emit('stat_info_wm', packet); console.log('Send packet to master: ERR- REPRESENT');
+      }
+      else {
+        console.log('####################'); console.log('Query sucess');
+        res.render('stat_info.ejs', {
+          username: sess.username
+        });
+      }
     });
+
 
   } else {
     res.redirect('/');

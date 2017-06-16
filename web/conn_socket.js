@@ -6,9 +6,6 @@ const host ='127.0.0.1';
 var socket = io.connect('http://' + host + ':' + port, { reconnect: true });//RECONNECT
 
 socket.on('connect', function(socket) {
-  if (session.dstkey) {
-    socket.emit('join', session.dstkey);//PRIVATE COMMUNICATION
-  }
   console.log('The socket network is connected');
 });
 socket.on('disconnect', function(socket) {
