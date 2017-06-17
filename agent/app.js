@@ -11,15 +11,15 @@ var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
-var packet = {
-  head: {},
-  input: {},
-  output: {},
-  error: {}
-};
+
 
 socket.on('stat_info_ma', function (message) {
-
+  var packet = {
+    head: {},
+    input: {},
+    output: {},
+    error: {}
+  };
   console.log('####################');
   console.log('Receive packet from master');//DIRECT QUERY
   console.log(message);
@@ -40,6 +40,12 @@ socket.on('stat_info_ma', function (message) {
   console.log('####################'); console.log('Send packet to master'); console.log(packet);
 });
 socket.on('stat_disk_ma', function (message) {
+  var packet = {
+    head: {},
+    input: {},
+    output: {},
+    error: {}
+  };
   console.log('####################');
   console.log('Receive packet from master');//DIRECT QUERY
   console.log(message);
@@ -51,14 +57,14 @@ socket.on('stat_disk_ma', function (message) {
 
   if (message.head.dstkey !== session.svrkey) {
     packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
+    socket.emit('stat_disk_am', packet);
   } else {
     func_query.stat_disk( function (result) {
       packet.error.code = 0; packet.error.mesg = 'Correct packet data';
       packet.output = result;
+      socket.emit('stat_disk_am', packet);
     });
   }
-
-  socket.emit('stat_disk_am', packet);
   console.log('####################'); console.log('Send packet to master'); console.log(packet);
 });
 //DATACAPTURE
