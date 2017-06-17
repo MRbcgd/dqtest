@@ -11,30 +11,29 @@ var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
-func_query.stat_disk();
-
 var packet = {
   head: {},
+  input: {},
   output: {},
   error: {}
 };
 
 socket.on('stat_info_ma', function (message) {
+
   console.log('####################');
-  console.log('Receive packet from master: DQ- stat_info event');//DIRECT QUERY
+  console.log('Receive packet from master');//DIRECT QUERY
   console.log(message);
-  packet.head.svrkey = session.svrkey; //DSTKEY -> SVRKEY NAME CHANGE
+
   packet.head.login_token = message.head.login_token;
-  packet.head.query_type = message.head.query_type;
   packet.head.svccd = message.head.svccd;
+  packet.head.query_type = message.head.query_type;
+  packet.head.svrkey = session.svrkey;
 
   if (message.head.dstkey !== session.svrkey) {
-
-
     packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
   } else {
     packet.error.code = 0; packet.error.mesg = 'Correct packet data';
-    packet.output = func_query.stat_info(func_query.cpu_info(), func_query.mem_info());//SYSTEM INFORMATION
+    packet.output = func_query.stat_info(func_query.cpu_info(), func_query.mem_info());
   }
 
   socket.emit('stat_info_am', packet);
@@ -42,19 +41,21 @@ socket.on('stat_info_ma', function (message) {
 });
 socket.on('stat_disk_ma', function (message) {
   console.log('####################');
-  console.log('Receive packet from master: DQ- stat_disk event');//DIRECT QUERY
+  console.log('Receive packet from master');//DIRECT QUERY
   console.log(message);
 
-  packet.head.svrkey = session.svrkey;
   packet.head.login_token = message.head.login_token;
-  packet.head.query_type = message.head.query_type;
   packet.head.svccd = message.head.svccd;
+  packet.head.query_type = message.head.query_type;
+  packet.head.svrkey = session.svrkey;
 
   if (message.head.dstkey !== session.svrkey) {
     packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
   } else {
-    packet.error.code = 0; packet.error.mesg = 'Correct packet data';
-    packet.output = func_query.stat_disk();//DISK - FILESYSTEM
+    func_query.stat_disk( function (result) {
+      packet.error.code = 0; packet.error.mesg = 'Correct packet data';
+      packet.output = result;
+    });
   }
 
   socket.emit('stat_disk_am', packet);

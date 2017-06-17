@@ -74,7 +74,8 @@ router.get('/stat_info', function(req, res) {
       query_type : 'direct',
       dstkey: req.session.dstkey
     },
-    input: null
+    input: {},
+    output: {}
   };
 
   if (sess.username) {
@@ -87,26 +88,23 @@ router.get('/stat_info', function(req, res) {
       if ( message.head.login_token !== req.session.login_token) {
         console.log('Incorrect login token: ERR- SESSION DESTROY');
 
-        req.session.destroy(function(err){
+        req.session.destroy(function(err){//INCORRECT USER
          if (err) {
            throw err;
          }
          res.redirect('/')
        });
       }
-      else if ( message.error.code !== 0 ) {
+      else if ( message.error.code !== 0 ) {//REPRESENT PACKET
         socket.emit('stat_info_wm', packet); console.log('Send packet to master: ERR- REPRESENT');
       }
-      else {
-        console.log('####################'); console.log('Query sucess');
+      else {//RESULT
+        console.log('####################'); console.log('Query sucess');console.log(message);
 
-       res.render('stat_info.ejs');
-        console.log(message);
+        // res.render('stat_info.ejs');
       }
     });
-
-
-  } else {
+  } else {//URL DEFENCE
     res.redirect('/');
   }
 });
@@ -217,7 +215,8 @@ router.get('/stat_disk', function(req, res, next) {
       query_type : 'direct',
       dstkey: req.session.dstkey
     },
-    input: null
+    input: {},
+    output: {}
   };
 
   if (sess.username) {
@@ -227,28 +226,26 @@ router.get('/stat_disk', function(req, res, next) {
 
     socket.on('stat_disk_mw', function (message) {
       console.log('#####################'); console.log('Receive packet from master'); console.log(message);
-      if ( message.head.login_token !== req.session.login_token ) {
+      if ( message.head.login_token !== req.session.login_token) {
         console.log('Incorrect login token: ERR- SESSION DESTROY');
 
-        req.session.destroy(function(err){
+        req.session.destroy(function(err){//INCORRECT USER
          if (err) {
            throw err;
          }
          res.redirect('/')
        });
       }
-      else if ( message.error.code !== 0 ) {
+      else if ( message.error.code !== 0 ) {//REPRESENT PACKET
         socket.emit('stat_disk_wm', packet); console.log('Send packet to master: ERR- REPRESENT');
       }
-      else {
-        console.log('####################'); console.log('Query sucess');
+      else {//RESULT
+        console.log('####################'); console.log('Query sucess');console.log(message);
 
-        res.render('stat_info.ejs');
-        console.log(message);
+        // res.render('stat_disk.ejs');
       }
     });
-
-  } else {
+  } else {//URL DEFENCE
     res.redirect('/');
   }
 });

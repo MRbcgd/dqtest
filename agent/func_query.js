@@ -84,18 +84,16 @@ module.exports.usage_disk = function () {//get disk usage ##db-query
     // return us;
   });
 };
-module.exports.stat_disk = function () {//disk status ##direct-query
+module.exports.stat_disk = function ( callback ) {//disk status ##direct-query
   var df = require('df');
 
   df(function (err, table) {
     if (err) {
       console.error(err.stack);
       return;
-    }
+    };
 
-    var mount, total, us = 0;
+    return callback(table);
 
-    console.log(table);
-    return table;
-  })
+  });
 };
