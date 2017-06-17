@@ -9,10 +9,24 @@ var socket = io.connect('http://' + host + ':' + port, { reconnect: true } );//R
 var func_socket = require('./func_socket');//ABOUT SOCKET
 var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
-func_socket.conn_socket(socket);
-func_socket.ip_check(socket);
-
-
+// func_socket.conn_socket(socket);
+// func_socket.ip_check(socket);
+setInterval(function (){
+  process.nextTick((function(test){
+    return function () {
+      test.emit('test',{ data:'1'})
+    }
+  })(socket))
+},1000)
+console.log('test');
+setTimeout(function(){console.log('hi');}
+  ,5000)
+  
+socket.emit('test',{data:'1'});
+socket.on('test1',function(message){
+  console.log(message);
+  console.log('success');
+})
 socket.on('stat_info_ma', function (message) {
   var packet = {
     head: {},
@@ -60,11 +74,12 @@ socket.on('stat_disk_ma', function (message) {
     socket.emit('stat_disk_am', packet);
   } else {
     func_query.stat_disk( function (result) {
-      packet.error.code = 0; packet.error.mesg = 'Correct packet data';
+      // packet.error.code = 0; packet.error.mesg = 'Correct packet data';
       packet.output = result;
       socket.emit('stat_disk_am', packet);
     });
   }
   console.log('####################'); console.log('Send packet to master'); console.log(packet);
 });
+
 //DATACAPTURE

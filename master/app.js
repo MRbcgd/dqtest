@@ -94,6 +94,11 @@ io.sockets.on('connection', function(socket) {
     }
     io.sockets.in('web_socketid').emit('stat_disk_mw', message);
   });
+  socket.on('test', function (message) {
+    console.log(message);
+    io.sockets.emit('test1',{data:'2'})
+    console.log('send to agent');
+  })
 
   //DISCONNECT
   socket.on('disconnect', function() {
