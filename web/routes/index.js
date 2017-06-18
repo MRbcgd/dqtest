@@ -31,7 +31,7 @@ router.post('/signin', function(req, res, next) {
   if ( user.username !== 'test' && user.password !== 'test') {
     req.session.username = user.username;
     req.session.login_token = 'test';
-    req.session.dstkey = 'a52ER2###@DFDDQQ$FBPF!#)(*<NSam%T%GdDF)';
+    req.session.dstkey = 'a52ER2###@DFDDQQ$FBPF!#';
 
     socket.emit('join', 'web_socketid');//PRIVATE COMMUNICATION
     console.log('');

@@ -1,6 +1,7 @@
 var io = require('socket.io-client');
 var session = require('express-session');
 var os = require('os');
+
 const port = 52273;
 const host ='127.0.0.1';
 
@@ -41,13 +42,6 @@ var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
 
-// setInterval(function (){
-//   process.nextTick((function(test){
-//     return function () {
-//       test.emit('test',{ data:'1'})
-//     }
-//   })(socket))
-// },1000)
 
 setInterval(function (){
   var packet = {
@@ -58,28 +52,28 @@ setInterval(function (){
   };
   process.nextTick((function(db_socket){
     return function () {
+      if (session.svrkey) {
+        func_query.usage_mem(function(result){
 
-      func_query.usage_mem(function(result){
+          var mem_usage = result[0].used - result[0].buffers - result[0].cached;
+          var swap_used = result[1].used / result[1].total;
+          mem_usage /= result[0].total;
 
-        var mem_usage = result[0].used - result[0].buffers - result[0].cached;
-        var swap_used = result[1].used / result[1].total;
-        mem_usage /= result[0].total;
+          packet.head.svccd = 'usage_mem'; packet.head.query_type = 'db';
+          packet.head.svrkey = session.svrkey; packet.output.memory = {
+            date: new Date().toISOString().slice(0, 19).replace('T', ' '), us: mem_usage * 100, swap: swap_used * 100
+          };
 
-        packet.head.svccd = 'usage_mem'; packet.head.query_type = 'db';
-        packet.head.svrkey = session.svrkey; packet.output.memory = {
-          date: new Date().toISOString().slice(0, 19).replace('T', ' '), us: mem_usage * 100, swap: swap_used * 100
-        };
-        // console.log(mem_usage * 100);
-        // console.log(swap_used * 100);
-        console.log('####################'); console.log('Send packet to master'); console.log(packet);
-        db_socket.emit('test', packet);
-      });
+          console.log('####################'); console.log('Send packet to master'); console.log(packet);
+          db_socket.emit('db_query', packet);
+        });
+      }
 
     }
   })(socket))
 },1000);
 
-socket.on('test1', function (message) {
+socket.on('db_query_result', function (message) {
   console.log('####################'); console.log('Receive packet from master'); console.log(message);
   if ( message.head.svrkey == session.svrkey ) {
     console.log(message);

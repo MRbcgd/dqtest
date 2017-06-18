@@ -2,12 +2,29 @@ var http = require('http');
 var ip = require('ip');
 var io = require('socket.io');
 var session = require('express-session');
+var mysql = require('mysql');
 
 const port = 52273;
 const host ='127.0.0.1';
 
-const dstkey = 'a52ER2###@DFDDQQ$FBPF!#)(*<NSam%T%GdDF)';
-const svrkey = 'a52ER2###@DFDDQQ$FBPF!#)(*<NSam%T%GdDF)';
+const dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';
+const svrkey = 'a52ER2###@DFDDQQ$FBPF!#)';
+
+var conn = mysql.createConnection({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: 'qkrcjfgud12',
+    database: 'server_monitoring',
+    multipleStatements: true
+});
+conn.connect(function(err) {
+  if (err) {
+    console.error('error connecting: ' + err.stack);
+    return;
+  }
+  console.log('connected as id ' + conn.threadId);
+});
 
 var server = http.createServer();
 
@@ -196,17 +213,30 @@ io.sockets.on('connection', function(socket) {
 
 // DB_QUERY
 
-  socket.on('test', function (message) {
+  socket.on('db_query', function (message) {
+
     console.log('####################'); console.log('Receive packet from agent'); console.log(message);
-    if ( message.head.svrkey == svrkey) {
-      if ( message.head.svccd == 'usage_mem') {
-        //DB
-      }
+    if ( message.head.svrkey === svrkey) {
+      console.log(svrkey);
+      if ( message.head.svccd === 'usage_mem') {
+        var sql = 'INSERT INTO agentmemory(svrkey, idate, us, swap) VALUES (?,?,?,?);';
+
+        conn.query(sql ,[
+          svrkey, message.output.memory.date, message.output.memory.us, message.output.memory.swap
+        ], function(err){
+          if(err){
+            throw err;
+          }
+          console.log('####################'); console.log('DB QUERY: Insert data to table')
+        })
+
+      };
       message.error.code = 101; message.error.mesg = 'Correct packet data'; message.output = {}
     } else {
       message.error.code = 0; message.error.mesg = 'Incorrect packet data';
     }
-    io.sockets.emit('test1',message)
+
+    io.sockets.emit('db_query_result', message)
     console.log('Send packet to agent'); console.log(message);
   })
 

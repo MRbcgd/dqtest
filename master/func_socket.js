@@ -8,7 +8,7 @@ module.exports.ip_check = function (socket) {
     if (message.data === default_ip) {//DEFAULT IP
       console.log('Accessible IP: Agent1');
 
-      svrkey = 'a52ER2###@DFDDQQ$FBPF!#)(*<NSam%T%GdDF)';
+      svrkey = 'a52ER2###@DFDDQQ$FBPF!#)';
     } else {
       console.log('Inaccessible IP: ', message.data);
 
