@@ -100,38 +100,38 @@ module.exports.usage_cpu = function () {
   //
 };
 module.exports.stat_prcs = function () {
-  var getMetrics = require('metrics-process');
-  function onMetrics( error, metrics ) {
-      if ( error ) {
-          throw new Error( error );
-      }
-      console.log( JSON.stringify( metrics ) );
-  };
+  var _ = require('lodash');
+  var ps = require('current-processes');
+  var procfs = require('procfs-stats');
+  var proctor = require('process-doctor');
 
-  getMetrics( onMetrics );
-  //   const psList = require('ps-list');
-  //   var usage = require('usage');
-  //   var options = { keepHistory: true }
-  //   usage.lookup(7893,options, function(err, result) {
-  //     console.log(result);
-  //   });
-  //   usage.lookup(7905, function(err, result) {
-  //     console.log(result);
-  //   });
-  //   usage.clearHistory(7905); //clear history for the given pid
-  //   usage.clearHistory();
-  // psList().then(data => {
-  //
-  //     for (var i = 0; i < data.length; i++) {
-  //       var options = { keepHistory: true }
-  //       usage.lookup(data[i].pid,options, function(err, result) {
-  //         console.log(result);
-  //       });
-  //       usage.clearHistory(data[i].pid); //clear history for the given pid
-  //       usage.clearHistory();
-  //     }
-  //
-  // });
+  ps.get(function(err, processes) {
+
+    var sorted = _.sortBy(processes, 'cpu');
+    var top3  = sorted.reverse().splice(0, 3);
+
+    console.log(top3);
+
+    var ps;
+    for (var i = 0; i < top3.length; i++) {
+      ps = procfs(top3[i].pid);
+      ps.stat(function(err,io){
+        console.log('my process has done this much io',io);
+      });
+
+      // utime
+      proctor.CLK_TCK // number, clocks per tick (used to calculate % CPU)
+
+      // PID {Number} is optional and defaults to process.pid
+      proctor.lookup(top3[i].pid, function(err, result) {
+        console.log('pid',result.pid);
+        console.log(err || result)
+      })
+    }
+  });
+
+
+
 };
 module.exports.usage_mem = function (callback) {
   var free = require('freem');

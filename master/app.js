@@ -94,6 +94,72 @@ io.sockets.on('connection', function(socket) {
     }
     io.sockets.in('web_socketid').emit('stat_disk_mw', message);
   });
+  //DIRECT QUERY WEB TO MASTER: IPCS - QUEUE
+  socket.on('stat_ipcq_wm', function (message) {
+    console.log('####################'); console.log('Receive packet from web'); console.log(message);
+
+    console.log('####################');
+    if ( message.head.dstkey === svrkey ) {//MORE SVRKEY WILL BE SUPPLY
+      io.sockets.in(svrkey).emit('stat_ipcq_ma', message);
+
+      console.log('Send packet to agent');
+    } else {//NO SERVER
+      message.error.code = 0; message.error.mesg = 'Incorrect packet data';
+      io.sockets.in('web_socketid').emit('stat_ipcq_mw', message);
+
+      console.log('Send packet to web: ERR- INCORRECT DSTKEY');
+    };
+    console.log(message);
+  });
+  //DIRECT QUERY AGENT TO MASTER: IPCS - QUEUE
+  socket.on('stat_ipcq_am', function (message) {
+    console.log('####################'); console.log('Receive packet from agent');
+    console.log(message);
+
+    if ( message.head.svrkey === dstkey ) {//MORE SVRKEY WILL BE SUPPLY
+      io.sockets.in('web_socketid').emit('stat_ipcq_mw', message);
+
+      console.log('Send packet to web'); console.log(message);
+    } else {//INCORRECT SVRKEY
+      message.error.code = 0; message.error.mesg = 'Incorrect packet data';
+
+      console.log('Send packet to agent: ERR- SEND BACK');
+    }
+    io.sockets.in('web_socketid').emit('stat_ipcq_mw', message);
+  });
+  //DIRECT QUERY WEB TO MASTER: IPCS - SHM
+  socket.on('stat_ipcm_wm', function (message) {
+    console.log('####################'); console.log('Receive packet from web'); console.log(message);
+
+    console.log('####################');
+    if ( message.head.dstkey === svrkey ) {//MORE SVRKEY WILL BE SUPPLY
+      io.sockets.in(svrkey).emit('stat_ipcm_ma', message);
+
+      console.log('Send packet to agent');
+    } else {//NO SERVER
+      message.error.code = 0; message.error.mesg = 'Incorrect packet data';
+      io.sockets.in('web_socketid').emit('stat_ipcm_mw', message);
+
+      console.log('Send packet to web: ERR- INCORRECT DSTKEY');
+    };
+    console.log(message);
+  });
+  //DIRECT QUERY AGENT TO MASTER: IPCS - SHM
+  socket.on('stat_ipcm_am', function (message) {
+    console.log('####################'); console.log('Receive packet from agent');
+    console.log(message);
+
+    if ( message.head.svrkey === dstkey ) {//MORE SVRKEY WILL BE SUPPLY
+      io.sockets.in('web_socketid').emit('stat_ipcm_mw', message);
+
+      console.log('Send packet to web'); console.log(message);
+    } else {//INCORRECT SVRKEY
+      message.error.code = 0; message.error.mesg = 'Incorrect packet data';
+
+      console.log('Send packet to agent: ERR- SEND BACK');
+    }
+    io.sockets.in('web_socketid').emit('stat_ipcm_mw', message);
+  });
   //DIRECT QUERY WEB TO MASTER: DISK - FILE SYSTEM
   socket.on('stat_disk_wm', function (message) {
     console.log('####################'); console.log('Receive packet from web'); console.log(message);
@@ -127,11 +193,22 @@ io.sockets.on('connection', function(socket) {
     }
     io.sockets.in('web_socketid').emit('stat_disk_mw', message);
   });
-  // socket.on('test', function (message) {
-  //   console.log(message);
-  //   io.sockets.emit('test1',{data:'2'})
-  //   console.log('send to agent');
-  // })
+
+// DB_QUERY
+
+  socket.on('test', function (message) {
+    console.log('####################'); console.log('Receive packet from agent'); console.log(message);
+    if ( message.head.svrkey == svrkey) {
+      if ( message.head.svccd == 'usage_mem') {
+        //DB
+      }
+      message.error.code = 101; message.error.mesg = 'Correct packet data'; message.output = {}
+    } else {
+      message.error.code = 0; message.error.mesg = 'Incorrect packet data';
+    }
+    io.sockets.emit('test1',message)
+    console.log('Send packet to agent'); console.log(message);
+  })
 
   //DISCONNECT
   socket.on('disconnect', function() {
