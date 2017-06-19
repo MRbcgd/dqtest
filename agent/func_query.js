@@ -109,39 +109,53 @@ module.exports.get_psef = function(callback){
       callback(result);
     });
 };
-module.exports.stat_psef = function () {
-  exports.get_cmmd(function(result){
-    console.log(result);
+module.exports.stat_prcs = function ( callback ) {
+  exports.get_psef(function(result){
+    var obj_arr = [];
+    var arrcnt = 0;
+    var loopcnt = 0;
+
+    result.toString().split("\n").forEach( function(line) {
+            if( loopcnt <= 0 ) {
+                    loopcnt++;
+                    return;
+            }
+            loopcnt++;
+
+            line = line.trim();
+            if( line == null || line.length <= 0 ) {
+                    // console.log("line length error... [" + line.length + "]");
+                    return;
+            }
+
+            var obj_cpu = {};
+
+            var record = line.replace(/\s+/g,' ');
+            if( record == null ) {
+                    console.log("record is null");
+                    return;
+            }
+
+            var items = record.split(' ').map(function(item) {
+                    return item.trim();
+            });
+            if( items == null) {
+              console.log('items null');
+                    return;
+            }
+
+            obj_cpu.pid = items[0];
+            obj_cpu.user = items[1];
+            obj_cpu.res = items[2];
+            obj_cpu.pcpu = items[3];
+            obj_cpu.time = items[4];
+            obj_cpu.cmmd = items[5];
+
+            obj_arr[arrcnt] = obj_cpu;
+            arrcnt++;
+    });
+    return callback(obj_arr);
   })
-  // var _ = require('lodash');
-  // var ps = require('current-processes');
-  // var procfs = require('procfs-stats');
-  // var proctor = require('process-doctor');
-  //
-  // ps.get(function(err, processes) {
-  //
-  //   var sorted = _.sortBy(processes, 'cpu');
-  //   var top3  = sorted.reverse().splice(0, 3);
-  //
-  //   console.log(top3);
-  //
-  //   var ps;
-  //   for (var i = 0; i < top3.length; i++) {
-  //     ps = procfs(top3[i].pid);
-  //     ps.stat(function(err,io){
-  //       console.log('my process has done this much io',io);
-  //     });
-  //
-  //     // utime
-  //     proctor.CLK_TCK // number, clocks per tick (used to calculate % CPU)
-  //
-  //     // PID {Number} is optional and defaults to process.pid
-  //     proctor.lookup(top3[i].pid, function(err, result) {
-  //       console.log('pid',result.pid);
-  //       console.log(err || result)
-  //     })
-  //   }
-  // });
 
 };
 module.exports.usage_mem = function (callback) {

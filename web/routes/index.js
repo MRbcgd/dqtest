@@ -131,9 +131,45 @@ router.get('/usage_cpu', function(req, res, next) {
 router.get('/stat_prcs', function(req, res, next) {
   var sess = req.session;
 
+  var packet = {
+    head: {
+      login_token : req.session.login_token,
+      svccd : 'stat_prcs',
+      query_type : 'direct',
+      dstkey: req.session.dstkey
+    },
+    input: {},
+    output: {},
+    error: {
+      code: null,
+      mesg: null
+    }
+  };
+
   if (sess.username) {
-    res.render('stat_prcs.ejs', {
-      username: sess.username
+    socket.emit('stat_prcs_wm', packet);//DIRECT QUERY WEB TO MASTER
+    console.log('#####################'); console.log('Send packet to master'); console.log(packet);
+
+    socket.on('stat_prcs_mw', function (message) {
+      console.log('#####################'); console.log('Receive packet from master'); console.log(message);
+      if ( message.head.login_token !== req.session.login_token) {
+        console.log('Incorrect login token: ERR- SESSION DESTROY');
+
+        req.session.destroy(function(err){//INCORRECT USER
+         if (err) {
+           throw err;
+         }
+         res.redirect('/')
+       });
+      }
+      else if ( message.error.code !== 0 ) {//REPRESENT PACKET
+        socket.emit('stat_prcs_wm', packet); console.log('Send packet to master: ERR- REPRESENT');
+      }
+      else {//RESULT
+        console.log('####################'); console.log('Query sucess');console.log(message);
+
+        // res.render('stat_info.ejs');
+      }
     });
   } else {
     res.redirect('/');

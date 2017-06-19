@@ -11,7 +11,9 @@ var func_socket = require('./func_socket');//ABOUT SOCKET
 var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
 
-
+func_query.stat_cpu(function(result){
+  console.log(result);
+})
 // func_query.usage_tcp(function(result){
 //   console.log(Object.keys(result));
 // // })
@@ -164,6 +166,35 @@ socket.on('stat_info_ma', function (message) {
   socket.emit('stat_info_am', packet);
   console.log('####################'); console.log('Send packet to master'); console.log(packet);
 });
+
+socket.on('stat_prcs_ma', function (message) {
+  var packet = {
+    head: {},
+    input: {},
+    output: {},
+    error: {}
+  };
+  console.log('####################');
+  console.log('Receive packet from master');//DIRECT QUERY
+  console.log(message);
+
+  packet.head.login_token = message.head.login_token;
+  packet.head.svccd = message.head.svccd;
+  packet.head.query_type = message.head.query_type;
+  packet.head.svrkey = session.svrkey;
+
+  if (message.head.dstkey !== session.svrkey) {
+    packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
+  } else {
+    funct_query.stat_prcs(function(result){
+      packet.error.code = 0; packet.error.mesg = 'Correct packet data';
+      packet.output = result;
+      socket.emit('stat_net_am', packet);
+      console.log('####################'); console.log('Send packet to master'); console.log(packet);
+    });
+  }
+});
+
 socket.on('stat_net_ma', function (message) {
   var packet = {
     head: {},
