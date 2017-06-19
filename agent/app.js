@@ -12,10 +12,9 @@ var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
 
 // func_query.stat_prcs();
-
-// func_query.usage_tcp(function (result) {
-//   console.log(result.ens33.bytes);
-// });
+// func_query.usage_tcp(function(result){
+//   console.log(Object.keys(result));
+// })
 
 // func_query.usage_mem(function(result){
 //   var mem_usage = result[0].used - result[0].buffers - result[0].cached;
@@ -42,33 +41,71 @@ var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
 
-
+//DB QUERY
+//#########################################################################################################
+//#########################################################################################################
+//#########################################################################################################
 setInterval(function (){
-  var packet = {
-    head: {},
-    input: {},
-    output: {},
-    error: {}
-  };
   process.nextTick((function(db_socket){
     return function () {
       if (session.svrkey) {
+        //USAGE -MEMORY
         func_query.usage_mem(function(result){
-
+          var packet = {head: {}, input: {}, output: {}, error: {}};
           var mem_usage = result[0].used - result[0].buffers - result[0].cached;
           var swap_used = result[1].used / result[1].total;
           mem_usage /= result[0].total;
 
-          packet.head.svccd = 'usage_mem'; packet.head.query_type = 'db';
-          packet.head.svrkey = session.svrkey; packet.output.memory = {
+          packet.head.svccd = 'usage_mem'; packet.head.query_type = 'db';packet.head.svrkey = session.svrkey;
+          packet.output.memory = {
             date: new Date().toISOString().slice(0, 19).replace('T', ' '), us: mem_usage * 100, swap: swap_used * 100
           };
 
           console.log('####################'); console.log('Send packet to master'); console.log(packet);
           db_socket.emit('db_query', packet);
         });
-      }
 
+        //NETWROK - TCP
+        func_query.usage_tcp(function(result){
+          var packet = {head: {}, input: {}, output: {}, error: {}};
+          var arr = Object.keys(result);
+
+          packet.head.svccd = 'usage_tcp'; packet.head.query_type = 'db';packet.head.svrkey = session.svrkey;
+
+          for (var i = 0; i < arr.length; i++) {
+            if (arr[i] === 'ens33') {//TEST
+              packet.output.tcp = {
+                date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                eth: 'ens33',
+                rcv: result.ens33.bytes.receive,
+                snd: result.ens33.bytes.transmit
+              };
+              console.log('####################'); console.log('Send packet to master'); console.log(packet);
+              db_socket.emit('db_query', packet);
+            };
+            if (arr[i] === 'enp2s0') {
+              packet.output.tcp = {
+                date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                eth: 'enp2s0',
+                rcv: result.enp2s0.bytes.receive,
+                snd: result.enp2s0.bytes.transmit
+              };
+              console.log('####################'); console.log('Send packet to master'); console.log(packet);
+              db_socket.emit('db_query', packet);
+            };
+            if (arr[i] === 'virbr0-nic') {
+              packet.output.tcp = {
+                date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                eth: 'virbr0-nic',
+                rcv: result.virbr0-nic.bytes.receive,
+                snd: result.virbr0-nic.bytes.transmit
+              };
+              console.log('####################'); console.log('Send packet to master'); console.log(packet);
+              db_socket.emit('db_query', packet);
+            }
+          };
+        });
+      }
     }
   })(socket))
 },1000);
@@ -80,13 +117,10 @@ socket.on('db_query_result', function (message) {
   }
 });
 
-
-
-// socket.emit('test',{data:'1'});
-// socket.on('test1',function(message){
-//   console.log(message);
-//   console.log('success');
-// })
+//DIRECT QUERY
+//#########################################################################################################
+//#########################################################################################################
+//#########################################################################################################
 socket.on('stat_info_ma', function (message) {
   var packet = {
     head: {},
@@ -231,5 +265,3 @@ socket.on('stat_disk_ma', function (message) {
   }
 
 });
-
-//DATACAPTURE
