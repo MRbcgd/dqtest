@@ -11,11 +11,10 @@ var func_socket = require('./func_socket');//ABOUT SOCKET
 var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
 
-// func_query.stat_prcs();
+
 // func_query.usage_tcp(function(result){
 //   console.log(Object.keys(result));
-// })
-
+// // })
 // func_query.usage_mem(function(result){
 //   var mem_usage = result[0].used - result[0].buffers - result[0].cached;
 //   var swap_used = result[1].used / result[1].total;
@@ -105,10 +104,28 @@ setInterval(function (){
             }
           };
         });
+
+        //DISK
+        func_query.usage_disk(function(result){
+          var packet = {head: {}, input: {}, output: {}, error: {}};
+          var usage = result;
+
+          packet.head.svccd = 'usage_disk'; packet.head.query_type = 'db'; packet.head.svrkey = session.svrkey;
+          packet.output.disk = {
+            date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+            mount: result.mount,
+            total: result.total,
+            us: result.us
+          };
+
+          console.log('####################'); console.log('Send packet to master'); console.log(packet);
+          db_socket.emit('db_query', packet);
+        })
+
       }
     }
   })(socket))
-},1000);
+},60000);
 
 socket.on('db_query_result', function (message) {
   console.log('####################'); console.log('Receive packet from master'); console.log(message);

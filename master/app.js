@@ -212,7 +212,9 @@ io.sockets.on('connection', function(socket) {
   });
 
 // DB_QUERY
-
+//#########################################################################################################
+//#########################################################################################################
+//#########################################################################################################
   socket.on('db_query', function (message) {
 
     console.log('####################'); console.log('Receive packet from agent'); console.log(message);
@@ -248,12 +250,29 @@ io.sockets.on('connection', function(socket) {
           console.log('####################'); console.log('DB QUERY: Insert data to table')
         })
       };
-      message.error.code = 101; message.error.mesg = 'Correct packet data'; message.output = {};
 
+      //DISK
+      if (message.head.svccd === 'usage_disk') {
+        var sql = 'INSERT INTO agentdisk(svrkey, idate, mount, total, us) VALUES (?,?,?,?,?);';
+
+        conn.query(sql ,[
+          svrkey,
+          message.output.disk.date,
+          message.output.disk.mount,
+          message.output.disk.total,
+          message.output.disk.us
+        ], function(err){
+          if(err){
+            throw err;
+          }
+          console.log('####################'); console.log('DB QUERY: Insert data to table')
+        });
+
+      };
+      message.error.code = 101; message.error.mesg = 'Correct packet data'; message.output = {};
     } else {
       message.error.code = 0; message.error.mesg = 'Incorrect packet data';
     }
-
     io.sockets.emit('db_query_result', message)
     console.log('Send packet to agent'); console.log(message);
   })

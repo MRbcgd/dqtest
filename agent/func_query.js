@@ -2,6 +2,7 @@ var ip = require('ip');
 var os = require('os');
 var fs = require('fs');
 var async = require('async');
+var exec = require('child_process').exec;
 // var conn = require('./db.js');
 
 var session = require('express-session');
@@ -99,38 +100,48 @@ module.exports.usage_status = function (callback) {
 module.exports.usage_cpu = function () {
   //
 };
-module.exports.stat_prcs = function () {
-  var _ = require('lodash');
-  var ps = require('current-processes');
-  var procfs = require('procfs-stats');
-  var proctor = require('process-doctor');
 
-  ps.get(function(err, processes) {
-
-    var sorted = _.sortBy(processes, 'cpu');
-    var top3  = sorted.reverse().splice(0, 3);
-
-    console.log(top3);
-
-    var ps;
-    for (var i = 0; i < top3.length; i++) {
-      ps = procfs(top3[i].pid);
-      ps.stat(function(err,io){
-        console.log('my process has done this much io',io);
-      });
-
-      // utime
-      proctor.CLK_TCK // number, clocks per tick (used to calculate % CPU)
-
-      // PID {Number} is optional and defaults to process.pid
-      proctor.lookup(top3[i].pid, function(err, result) {
-        console.log('pid',result.pid);
-        console.log(err || result)
-      })
-    }
-  });
-
-
+function execute(command, callback){
+    exec(command, function(error, stdout, stderr){ callback(stdout); });
+};
+module.exports.get_psef = function(callback){
+    execute("ps -eo pid,user,rss,pcpu,time,cmd --sort -pcpu | head -n 4", function(result){
+      callback(result);
+    });
+};
+module.exports.stat_psef = function () {
+  exports.get_cmmd(function(result){
+    console.log(result);
+  })
+  // var _ = require('lodash');
+  // var ps = require('current-processes');
+  // var procfs = require('procfs-stats');
+  // var proctor = require('process-doctor');
+  //
+  // ps.get(function(err, processes) {
+  //
+  //   var sorted = _.sortBy(processes, 'cpu');
+  //   var top3  = sorted.reverse().splice(0, 3);
+  //
+  //   console.log(top3);
+  //
+  //   var ps;
+  //   for (var i = 0; i < top3.length; i++) {
+  //     ps = procfs(top3[i].pid);
+  //     ps.stat(function(err,io){
+  //       console.log('my process has done this much io',io);
+  //     });
+  //
+  //     // utime
+  //     proctor.CLK_TCK // number, clocks per tick (used to calculate % CPU)
+  //
+  //     // PID {Number} is optional and defaults to process.pid
+  //     proctor.lookup(top3[i].pid, function(err, result) {
+  //       console.log('pid',result.pid);
+  //       console.log(err || result)
+  //     })
+  //   }
+  // });
 
 };
 module.exports.usage_mem = function (callback) {
@@ -353,19 +364,19 @@ module.exports.stat_ipcq = function(callback){
                                 return;
                         }
 
-                        obj_ipcq.key     = ustd.decToHex(items[0], 8); // "0x" + Number(items[0]).toString(16);
-                        obj_ipcq.msqid   = items[1];
-                        obj_ipcq.perms   = items[2];
-                        obj_ipcq.cbytes  = items[3];
-                        obj_ipcq.qnum    = items[4];
+                        obj_ipcq.key    = ustd.decToHex(items[0], 8); // "0x" + Number(items[0]).toString(16);
+                        obj_ipcq.msqid  = items[1];
+                        obj_ipcq.perms  = items[2];
+                        obj_ipcq.cbytes = items[3];
+                        obj_ipcq.qnum   = items[4];
 
-                        obj_ipcq.lspid   = items[5];
-                        obj_ipcq.lrpid   = items[6];
-                        obj_ipcq.owner   = ustd.getSysUser(items[7]);
+                        obj_ipcq.lspid  = items[5];
+                        obj_ipcq.lrpid  = items[6];
+                        obj_ipcq.owner  = ustd.getSysUser(items[7]);
 
-                        obj_ipcq.stime   = ustd.dateFormat(new Date(items[11]*1000), "%Y%m%d%H%M%S", false);
-                        obj_ipcq.rtime   = ustd.dateFormat(new Date(items[12]*1000), "%Y%m%d%H%M%S", false);
-                        obj_ipcq.ctime   = ustd.dateFormat(new Date(items[13]*1000), "%Y%m%d%H%M%S", false);
+                        obj_ipcq.stime  = ustd.dateFormat(new Date(items[11]*1000), "%Y%m%d%H%M%S", false);
+                        obj_ipcq.rtime  = ustd.dateFormat(new Date(items[12]*1000), "%Y%m%d%H%M%S", false);
+                        obj_ipcq.ctime  = ustd.dateFormat(new Date(items[13]*1000), "%Y%m%d%H%M%S", false);
 
                         obj_arr[arrcnt] = obj_ipcq;
                         arrcnt++;
@@ -446,34 +457,80 @@ module.exports.stat_ipcm = function(callback){
         });
 }
 module.exports.usage_disk = function (callback) {//get disk usage ##db-query
-  var df = require('df');
-
-  df(function (err, table) {
-    if (err) {
-      console.error(err.stack);
-      return;
-    }
-
-    var mount, total, us = 0;
-
-    for (var i = 0; i < table.length; i++) {//top usage
-      if ( us < table[i].percent ) {
-        us = table[i].percent;
-      };
+  exports.stat_disk(function(result){
+    console.log(result[0]);
+    var disk ={
+      total: Number(result[0].blocks),
+      mount: result[0].mount,
+      us: Number(result[0].us.replace('%',''))
     };
-    return callback(us);
-  });
+
+    return callback(disk);
+  })
+};
+module.exports.get_disk = function(callback){
+    execute("df -m | grep -v ^none | ( read header ; echo `$header` ; sort -rn -k 5)", function(result){
+      callback(result);
+    });
 };
 module.exports.stat_disk = function ( callback ) {//disk status ##direct-query
-  var df = require('df');
+  exports.get_disk(function(result){
+    var obj_arr = [];
+    var arrcnt = 0;
+    var loopcnt = 0;
 
-  df(function (err, table) {
-    if (err) {
-      console.error(err.stack);
-      return;
-    };
+    result.toString().split("\n").forEach( function(line) {
+            if( loopcnt <= 0 ) {
+                    loopcnt++;
+                    return;
+            }
+            loopcnt++;
 
-    return callback(table);
+            line = line.trim();
+            if( line == null || line.length <= 0 ) {
+                    // console.log("line length error... [" + line.length + "]");
+                    return;
+            }
 
-  });
+            var obj_disk = {};
+
+            var record = line.replace(/\s+/g,' ');
+            if( record == null ) {
+                    console.log("record is null");
+                    return;
+            }
+
+            var items = record.split(' ').map(function(item) {
+                    return item.trim();
+            });
+            if( items == null) {
+              console.log('items null');
+                    return;
+            }
+
+            obj_disk.fs = items[0];
+            obj_disk.blocks = items[1];
+            obj_disk.used = items[2];
+            obj_disk.available = items[3];
+            obj_disk.us = items[4];
+            obj_disk.mount = items[5];
+
+            obj_arr[arrcnt] = obj_disk;
+            arrcnt++;
+    });
+    return callback(obj_arr);
+  })
+
+
+  // var df = require('df');
+  //
+  // df(function (err, table) {
+  //   if (err) {
+  //     console.error(err.stack);
+  //     return;
+  //   };
+  //
+  //   return callback(table);
+  //
+  // });
 };

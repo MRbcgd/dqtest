@@ -6,10 +6,6 @@ var socket = require('../conn_socket.js');
 
 var router = express.Router();
 
-var pacekt = {
-  head: {},
-  input: {}
-};
 
 router.get('/', function(req, res, next) {
   var sess = req.session;
@@ -31,7 +27,7 @@ router.post('/signin', function(req, res, next) {
   if ( user.username !== 'test' && user.password !== 'test') {
     req.session.username = user.username;
     req.session.login_token = 'test';
-    req.session.dstkey = 'a52ER2###@DFDDQQ$FBPF!#';
+    req.session.dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';
 
     socket.emit('join', 'web_socketid');//PRIVATE COMMUNICATION
     console.log('');
@@ -67,7 +63,7 @@ router.get('/main', function(req, res, next) {
 router.get('/stat_info', function(req, res) {
   var sess = req.session;
 
-  packet = {
+  var packet = {
     head: {
       login_token : req.session.login_token,
       svccd : 'stat_info',
@@ -75,7 +71,11 @@ router.get('/stat_info', function(req, res) {
       dstkey: req.session.dstkey
     },
     input: {},
-    output: {}
+    output: {},
+    error: {
+      code: null,
+      mesg: null
+    }
   };
 
   if (sess.username) {
@@ -172,7 +172,11 @@ router.get('/stat_net', function(req, res, next) {
       dstkey: req.session.dstkey
     },
     input: {},
-    output: {}
+    output: {},
+    error: {
+      code: null,
+      mesg: null
+    }
   };
 
   if (sess.username) {
@@ -216,7 +220,11 @@ router.get('/stat_ipcq', function(req, res, next) {
       dstkey: req.session.dstkey
     },
     input: {},
-    output: {}
+    output: {},
+    error: {
+      code: null,
+      mesg: null
+    }
   };
 
   if (sess.username) {
@@ -259,7 +267,11 @@ router.get('/stat_ipcm', function(req, res, next) {
       dstkey: req.session.dstkey
     },
     input: {},
-    output: {}
+    output: {},
+    error: {
+      code: null,
+      mesg: null
+    }
   };
 
   if (sess.username) {
@@ -313,7 +325,11 @@ router.get('/stat_disk', function(req, res, next) {
       dstkey: req.session.dstkey
     },
     input: {},
-    output: {}
+    output: {},
+    error: {
+      code: null,
+      mesg: null
+    }
   };
 
   if (sess.username) {
