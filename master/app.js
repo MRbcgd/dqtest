@@ -294,6 +294,25 @@ io.sockets.on('connection', function(socket) {
         })
       };
 
+      //IPCQ
+      if (message.head.svccd === 'stat_ipcq') {
+        var sql = 'INSERT INTO agentipcq(svrkey, idate, qkey, qid, qnum, qbytes) VALUES (?,?,?,?,?,?);';
+
+        conn.query(sql ,[
+          svrkey,
+          message.output.queue.date,
+          message.output.queue.key,
+          message.output.queue.msqid,
+          message.output.queue.cbytes,
+          message.output.queue.qnum
+        ], function(err){
+          if(err){
+            throw err;
+          }
+          console.log('####################'); console.log('DB QUERY: Insert data to table')
+        });
+
+      };
       //DISK
       if (message.head.svccd === 'usage_disk') {
         var sql = 'INSERT INTO agentdisk(svrkey, idate, mount, total, us) VALUES (?,?,?,?,?);';

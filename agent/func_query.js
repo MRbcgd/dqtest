@@ -66,6 +66,7 @@ module.exports.stat_info = function (data1,data2) {//system information ##direct
   return result;
 };
 module.exports.usage_status = function (callback) {
+
   // var cpu_usage = os.loadavg();
   //
   // var free = require('freem');
@@ -97,13 +98,22 @@ module.exports.usage_status = function (callback) {
 
 
 };
-module.exports.usage_cpu = function () {
-  //
-};
-
 function execute(command, callback){
     exec(command, function(error, stdout, stderr){ callback(stdout); });
 };
+module.exports.get_psnm = function(prcs, callback){
+    execute("ps -p " + Number(prcs.pid) + " -o comm=", function(result){
+      return callback(result,Number(prcs.pcpu));
+    });
+};
+module.exports.usage_cpu = function ( callback ) {
+
+    exports.stat_prcs(function (result){
+
+    })
+};
+
+
 module.exports.get_psef = function(callback){
     execute("ps -eo pid,user,rss,pcpu,time,cmd --sort -pcpu | head -n 4", function(result){
       callback(result);
@@ -358,8 +368,11 @@ module.exports.stat_ipcq = function(callback){
 
                         line = line.trim();
                         if( line == null || line.length <= 0 ) {
-                                // console.log("line length error... [" + line.length + "]");
-                                return;
+                                console.log('#######################');console.log('#######################');
+                                console.log("line length error... [" + line.length + "]");
+                                console.log('/proc/sysvipc/msg EMPTY!');
+                                console.log('#######################');console.log('#######################');
+                                return callback(null,null);
                         }
 
                         var obj_ipcq = {};
@@ -535,16 +548,4 @@ module.exports.stat_disk = function ( callback ) {//disk status ##direct-query
     return callback(obj_arr);
   })
 
-
-  // var df = require('df');
-  //
-  // df(function (err, table) {
-  //   if (err) {
-  //     console.error(err.stack);
-  //     return;
-  //   };
-  //
-  //   return callback(table);
-  //
-  // });
 };
