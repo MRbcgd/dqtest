@@ -10,37 +10,6 @@ var socket = io.connect('http://' + host + ':' + port, { reconnect: true } );//R
 var func_socket = require('./func_socket');//ABOUT SOCKET
 var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
-// func_query.stat_ipcq(function(result){
-//   console.log(result);
-// })
-// func_query.usage_cpu(function(cpu_usage,prcnm,prcus){
-//   console.log(cpu_usage,prcnm,prcus);
-// })
-// func_query.usage_tcp(function(result){
-//   console.log(Object.keys(result));
-// // })
-// func_query.usage_mem(function(result){
-//   var mem_usage = result[0].used - result[0].buffers - result[0].cached;
-//   var swap_used = result[1].used / result[1].total;
-//   mem_usage /= result[0].total;
-//   console.log(mem_usage * 100);
-//   console.log(swap_used * 100);
-// })
-
-// func_query.stat_net(function(err,results){
-//   if (err) {
-//     throw err;
-//   }
-//   console.log(results);
-// });
-
-// func_query.stat_ipcq(function(err, result){
-//   console.log(result[0]);
-// })
-// func_query.stat_ipcm(function(err, result){
-//   console.log(data);
-// })
-
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
 
@@ -52,6 +21,24 @@ setInterval(function (){
   process.nextTick((function(db_socket){
     return function () {
       if (session.svrkey) {
+        //CPU - CPU
+        func_query.stat_prcs(function(result){
+          var packet = {head: {}, input: {}, output: {}, error: {}};
+          var us = os.loadavg();
+
+          packet.head.svccd = 'stat_prcs'; packet.head.query_type = 'db'; packet.head.svrkey = session.svrkey;
+          packet.output.cpu = {
+            date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+            us: us[0],
+            prcs1_nm: result[0].cmmd, prcs1_us: Number(result[0].pcpu),
+            prcs2_nm: result[1].cmmd, prcs2_us: Number(result[1].pcpu),
+            prcs3_nm: result[2].cmmd, prcs3_us: Number(result[2].pcpu)
+          };
+
+          console.log('####################'); console.log('Send packet to master'); console.log(packet);
+          db_socket.emit('db_query', packet);
+        });
+
         //USAGE -MEMORY
         func_query.usage_mem(function(result){
           var packet = {head: {}, input: {}, output: {}, error: {}};
@@ -161,7 +148,7 @@ setInterval(function (){
       }
     }
   })(socket))
-},1000);
+},60000);
 
 socket.on('db_query_result', function (message) {
   console.log('####################'); console.log('Receive packet from master'); console.log(message);

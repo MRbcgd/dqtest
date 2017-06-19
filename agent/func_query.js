@@ -3,18 +3,12 @@ var os = require('os');
 var fs = require('fs');
 var async = require('async');
 var exec = require('child_process').exec;
-// var conn = require('./db.js');
 
 var session = require('express-session');
 
 
 const local_ip = ip.address();//for test
 
-
-//usage_status
-//usage_cpu
-//stat_prcs
-//
 module.exports.cpu_info = function () {//get cpu resource
   var cpuinfo = require('proc-cpuinfo')();
   var result = {};
@@ -58,64 +52,19 @@ module.exports.stat_info = function (data1,data2) {//system information ##direct
   for(var key in data1) result[key] = data1[key];
   for(var key in data2) result[key] = data2[key];
 
-  result.platform = os.platform();
-  result.kernel = 'i dnt knw.';
-  result.hostname = os.hostname();
-  result.ip = ip.address();
-
   return result;
-};
-module.exports.usage_status = function (callback) {
-
-  // var cpu_usage = os.loadavg();
-  //
-  // var free = require('freem');
-  // var df = require('df');
-  //
-  // free(function (err, list) {
-  //
-  //   df(function (err, table) {
-  //     if (err) {
-  //       console.error(err.stack);
-  //       return;
-  //     }
-  //
-  //     var disk_usage = 0;
-  //
-  //     for (var i = 0; i < table.length; i++) {//top usage
-  //       if ( disk_usage < table[i].percent ) {
-  //         disk_usage = table[i].percent;
-  //       };
-  //     };
-  //     var mem_usage = list[0].used - list[0].buffers - list[0].cached;
-  //
-  //     mem_usage /= list[0].total;
-  //     return callback(cpu_usage[0], mem_usage * 100, disk_usage);
-  //   });
-  //
-  // });
-  // // usage_mem(function)
-
-
 };
 function execute(command, callback){
     exec(command, function(error, stdout, stderr){ callback(stdout); });
 };
-module.exports.get_psnm = function(prcs, callback){
-    execute("ps -p " + Number(prcs.pid) + " -o comm=", function(result){
-      return callback(result,Number(prcs.pcpu));
+
+module.exports.usage_cpu = function ( callback ) {
+    exports.stat_prcs(function(result){
+
     });
 };
-module.exports.usage_cpu = function ( callback ) {
-
-    exports.stat_prcs(function (result){
-
-    })
-};
-
-
 module.exports.get_psef = function(callback){
-    execute("ps -eo pid,user,rss,pcpu,time,cmd --sort -pcpu | head -n 4", function(result){
+    execute("ps -eo pid,user,rss,pcpu,time,comm --sort -pcpu | head -n 4", function(result){
       callback(result);
     });
 };
@@ -166,7 +115,6 @@ module.exports.stat_prcs = function ( callback ) {
     });
     return callback(obj_arr);
   })
-
 };
 module.exports.usage_mem = function (callback) {
   var free = require('freem');

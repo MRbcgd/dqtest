@@ -262,6 +262,22 @@ io.sockets.on('connection', function(socket) {
 
     console.log('####################'); console.log('Receive packet from agent'); console.log(message);
     if ( message.head.svrkey === svrkey) {
+      //CPU - CPU
+      if ( message.head.svccd === 'stat_prcs') {
+        var sql = 'INSERT INTO agentcpu(svrkey, idate, us, prcs1_nm, prcs1_us, prcs2_nm, prcs2_us, prcs3_nm, prcs3_us) VALUES (?,?,?,?,?,?,?,?,?);';
+
+        conn.query(sql ,[
+          svrkey, message.output.cpu.date, message.output.cpu.us,
+          message.output.cpu.prcs1_nm, message.output.cpu.prcs1_us,
+          message.output.cpu.prcs2_nm, message.output.cpu.prcs2_us,
+          message.output.cpu.prcs2_nm, message.output.cpu.prcs2_us
+        ], function(err){
+          if(err){
+            throw err;
+          }
+          console.log('####################'); console.log('DB QUERY: Insert data to table')
+        })
+      };
       //USAGE - MEMORY
       if ( message.head.svccd === 'usage_mem') {
         var sql = 'INSERT INTO agentmemory(svrkey, idate, us, swap) VALUES (?,?,?,?);';
