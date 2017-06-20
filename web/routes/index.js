@@ -1,11 +1,9 @@
 var express = require('express');
 var fs = require('fs');
 var ejs = require('ejs');
-
 var socket = require('../conn_socket.js');
-
+var session = require('express-session');
 var router = express.Router();
-
 
 router.get('/', function(req, res, next) {
   var sess = req.session;
@@ -18,19 +16,18 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/signin', function(req, res, next) {
-
+  var sess = req.session;
   var user = {
     username : req.body.username,
     password : req.body.password
   };
 
   if ( user.username !== 'test' && user.password !== 'test') {
-    req.session.username = user.username;
-    req.session.login_token = 'test';
-    req.session.dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';
+    sess.username = user.username;
+    // sess.login_token = 'test';
+    // sess.dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';
 
     socket.emit('join', 'web_socketid');//PRIVATE COMMUNICATION
-    console.log('');
     res.redirect('/main');
   } else {
     res.redirect('/');
@@ -60,23 +57,23 @@ router.get('/main', function(req, res, next) {
     res.redirect('/');
   }
 });
-router.get('/stat_info', function(req, res) {
+router.get('/stat_info', function(req, res, next) {
   var sess = req.session;
 
-  var packet = {
-    head: {
-      login_token : req.session.login_token,
-      svccd : 'stat_info',
-      query_type : 'direct',
-      dstkey: req.session.dstkey
-    },
-    input: {},
-    output: {},
-    error: {
-      code: null,
-      mesg: null
-    }
-  };
+  // var packet = {
+  //   head: {
+  //     login_token : req.session.login_token,
+  //     svccd : 'stat_info',
+  //     query_type : 'direct',
+  //     dstkey: req.session.dstkey
+  //   },
+  //   input: {},
+  //   output: {},
+  //   error: {
+  //     code: null,
+  //     mesg: null
+  //   }
+  // };
 
   if (sess.username) {
 
@@ -95,15 +92,14 @@ router.get('/stat_info', function(req, res) {
          res.redirect('/')
        });
       }
-      else if ( message.error.code !== 0 ) {//REPRESENT PACKET
+      if ( message.error.code !== 0 ) {//REPRESENT PACKET
         socket.emit('stat_info_wm', packet); console.log('Send packet to master: ERR- REPRESENT');
-      }
-      else {//RESULT
-        console.log('####################'); console.log('Query sucess');console.log(message);
+      };
 
-        // res.render('stat_info.ejs');
-      }
     });
+    res.render('stat_info.ejs');
+
+    // res.render('stat_info.ejs');
   } else {//URL DEFENCE
     res.redirect('/');
   }
