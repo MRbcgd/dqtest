@@ -73,19 +73,34 @@ var packet = {
 };
 
 io.on("connection",function(socket){
+  var id = 0;
+  id = socket.id;
 
   socket.on('client',function(data){
     console.log(data);
   });
+  // socket.on('join', function (room) {
+  //   socket.join(room);
+  // });
+
+
   socket.on('list', function(data){
     packet.head.svccd = data;
-    if (data === 'stat_info') {
-      client_socket.emit('stat_info_wm', packet);//DIRECT QUERY WEB TO MASTER
-    }
+    client_socket.emit('wm', packet);//DIRECT QUERY WEB TO MASTER
     console.log('#####################'); console.log('Send packet to master'); console.log(packet);
-  })
 
-})
+    client_socket.on('mw', function (message) {
+      console.log('#####################'); console.log('Receive packet from master'); console.log(message);
+      if ( message.error.code !== 0 ) {//REPRESENT PACKET
+        client_socket.emit('wm', packet); console.log('Send packet to master: ERR- REPRESENT');
+      } else {
+        io.to(id).emit('message', message.output);
+      }
+    });
+
+  });
+
+});
 
 
 module.exports = app;

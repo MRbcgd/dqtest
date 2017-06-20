@@ -12,8 +12,17 @@
   <script src='/socket.io/socket.io.js'></script>
 
   <script>
-    var socket = io.connect();
-    socket.emit('list',{ data : 'stat_info' });
+    $(document).ready(function(){
+
+      var socket = io.connect();
+      socket.emit('join', 'stat_info');
+
+      socket.emit('list','stat_info');
+      socket.on('message', function (message) {
+        alert(JSON.stringify(message));
+      })
+    });
+
   </script>
 
 </head>
