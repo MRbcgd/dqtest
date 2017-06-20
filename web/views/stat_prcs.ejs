@@ -15,10 +15,12 @@
     $(function(){
       var socket = io.connect();
 
+      // socket.emit('join','stat_prcs');
       socket.emit('list','stat_prcs');
+
       socket.on('message', function (message) {
         alert(JSON.stringify(message));
-      })
+      });
     });
 
     </script>

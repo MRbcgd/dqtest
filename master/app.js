@@ -9,6 +9,7 @@ const host ='127.0.0.1';
 
 const dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';
 const svrkey = 'a52ER2###@DFDDQQ$FBPF!#)';
+const login_token = 'login1';
 
 var conn = mysql.createConnection({
     host: 'localhost',
@@ -36,6 +37,7 @@ io = io.listen(server);
 var func_socket = require('./func_socket.js');
 
 io.sockets.on('connection', function(socket) {
+
   console.log('The socket network is connected');
 
   func_socket.ip_check(socket);//IP CHECK
@@ -56,7 +58,7 @@ io.sockets.on('connection', function(socket) {
       console.log('Send packet to agent');
     } else {//NO SERVER
       message.error.code = 0; message.error.mesg = 'Incorrect packet data';
-      io.sockets.in('web_socketid').emit('mw', message);
+      io.sockets.in(login_token).emit('mw', message);
 
       console.log('Send packet to web: ERR- INCORRECT DSTKEY');
     };
@@ -69,13 +71,15 @@ io.sockets.on('connection', function(socket) {
     console.log(message);
 
     if ( message.head.svrkey === dstkey ) {//MORE SVRKEY WILL BE SUPPLY
-      io.sockets.in('web_socketid').emit('mw', message);
-
+      io.sockets.in(login_token).emit('mw', message);
       console.log('Send packet to web'); console.log(message);
     } else {//INCORRECT SVRKEY
-      message.error.code = 0; message.error.mesg = 'Incorrect packet data';;
+      message.error.code = 0; message.error.mesg = 'Incorrect packet data';
+      io.sockets.in(svrkey).emit('ma', message);
+
+      console.log('Send packet to web: ERR- INCORRECT DSTKEY');
     }
-      io.sockets.in('web_socketid').emit('mw', message);
+    
   });
 
 // DB_QUERY

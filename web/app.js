@@ -12,9 +12,8 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var app = express();
 
-const login_token = 'test';//NOT YET
 const dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';//NOT YET
-
+const login_token = 'login1';//NOT YET
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -73,8 +72,6 @@ var packet = {
 };
 
 io.on("connection",function(socket){
-  var id = 0;
-  id = socket.id;
 
   socket.on('client',function(data){
     console.log(data);
@@ -84,18 +81,20 @@ io.on("connection",function(socket){
     packet.head.svccd = data;
     client_socket.emit('wm', packet);//DIRECT QUERY WEB TO MASTER
     console.log('#####################'); console.log('Send packet to master'); console.log(packet);
-
-    client_socket.on('mw', function (message) {
-      console.log('#####################'); console.log('Receive packet from master'); console.log(message);
-      if ( message.error.code !== 0 ) {//REPRESENT PACKET
-        client_socket.emit('wm', packet); console.log('Send packet to master: ERR- REPRESENT');
-      } else {
-        io.to(id).emit('message', message.output);
-      }
-    });
-
   });
 
+  socket.on('disconnect', function () {
+    console.log('User disconnected');
+  });
+});
+
+client_socket.on('mw', function (message) {
+  console.log('#####################'); console.log('Receive packet from master'); console.log(message);
+  if ( message.error.code !== 0 ) {//REPRESENT PACKET
+    client_socket.emit('wm', packet); console.log('Send packet to master: ERR- REPRESENT');
+  } else {
+    io.sockets.emit('message', message.output);
+  }
 });
 
 

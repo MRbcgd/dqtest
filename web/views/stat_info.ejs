@@ -14,11 +14,11 @@
   <script>
     $(document).ready(function(){
 
-      var socket = io.connect();
+      var socket = io();
 
       socket.emit('list','stat_info');
       socket.on('message', function (message) {
-        alert(JSON.stringify(message));
+        socket.disconnect();
       })
     });
 
@@ -58,8 +58,7 @@
           </thead>
           <tbody>
             <tr>
-              <td class="col-xs-3">CPU Model</td>
-              <td class="col-xs-3">data</td>
+              <td id = 'test' class="col-xs-3">CPU Model</td>
             </tr>
 
             <tr>
@@ -71,7 +70,7 @@
               <td class="col-xs-3">data</td>
             </tr>
             <tr>
-              <td class="col-xs-3">stepping</td>
+              <td class="col-xs-3">Stepping</td>
               <td class="col-xs-3">data</td>
             </tr>
             <tr>
@@ -94,38 +93,7 @@
               <td class="col-xs-3">Memory (swap)</td>
               <td class="col-xs-3">data</td>
             </tr>
-            <tr>
-              <td class="col-xs-3">OS</td>
-              <td class="col-xs-3"></td>
-            </tr>
-            <tr>
-              <td class="col-xs-3">Kernel</td>
-              <td class="col-xs-3">data</td>
-            </tr>
-            <tr>
-              <td class="col-xs-3">Hostname</td>
-              <td class="col-xs-3">data</td>
-            </tr>
-            <tr>
-              <td class="col-xs-3">IP</td>
-              <td class="col-xs-3">data</td>
-            </tr>
-            <tr>
-              <td class="col-xs-3">Disk</td>
-              <td class="col-xs-3"></td>
-            </tr>
-            <tr>
-              <td class="col-xs-3">Disk</td>
-              <td class="col-xs-3"></td>
-            </tr>
-            <tr>
-              <td class="col-xs-3">Disk</td>
-              <td class="col-xs-3">usage_disk</td>
-            </tr>
-            <tr>
-              <td class="col-xs-3">Filesystem</td>
-              <td class="col-xs-3">stat_disk</td>
-            </tr>
+
           </tbody>
         </table>
       </div>

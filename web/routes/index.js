@@ -5,6 +5,8 @@ var socket = require('../conn_socket.js');
 var session = require('express-session');
 var router = express.Router();
 
+var conn = require('../conn_db.js');
+
 router.get('/', function(req, res, next) {
   var sess = req.session;
 
@@ -24,10 +26,10 @@ router.post('/signin', function(req, res, next) {
 
   if ( user.username !== 'test' && user.password !== 'test') {
     sess.username = user.username;
-    // sess.login_token = 'test';
+    sess.login_token = 'login1';//###NEED MAKING RULE MORE WEB CLIENT COMMING
     // sess.dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';
 
-    socket.emit('join', 'web_socketid');//PRIVATE COMMUNICATION
+    socket.emit('join', sess.login_token);//PRIVATE COMMUNICATION
 
     res.redirect('/main');
   } else {
