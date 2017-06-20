@@ -13,7 +13,6 @@
   <script>
   $(function(){
     var socket = io.connect();
-    socket.emit('join', 'stat_net');
 
     socket.emit('list','stat_net');
     socket.on('message', function (message) {

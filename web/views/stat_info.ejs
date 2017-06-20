@@ -15,7 +15,6 @@
     $(document).ready(function(){
 
       var socket = io.connect();
-      socket.emit('join', 'stat_info');
 
       socket.emit('list','stat_info');
       socket.on('message', function (message) {

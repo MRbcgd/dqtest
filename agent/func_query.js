@@ -3,9 +3,7 @@ var os = require('os');
 var fs = require('fs');
 var async = require('async');
 var exec = require('child_process').exec;
-
 var session = require('express-session');
-
 
 const local_ip = ip.address();//for test
 

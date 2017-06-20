@@ -79,10 +79,6 @@ io.on("connection",function(socket){
   socket.on('client',function(data){
     console.log(data);
   });
-  // socket.on('join', function (room) {
-  //   socket.join(room);
-  // });
-
 
   socket.on('list', function(data){
     packet.head.svccd = data;

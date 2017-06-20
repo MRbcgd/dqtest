@@ -13,6 +13,71 @@ var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
 
+//DIRECT QUERY
+//#########################################################################################################
+//#########################################################################################################
+//#########################################################################################################
+socket.on('ma', function (message) {
+  var packet = {head: {},input: {},output: {}, error: {}
+  };
+  console.log('####################');
+  console.log('Receive packet from master');//DIRECT QUERY
+  console.log(message);
+
+  packet.head.login_token = message.head.login_token;
+  packet.head.svccd = message.head.svccd;
+  packet.head.query_type = message.head.query_type;
+  packet.head.svrkey = session.svrkey;
+
+  if (message.head.dstkey !== session.svrkey) {
+    packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
+  } else {
+    var svccd = packet.head.svccd;
+    packet.error.code = 0; packet.error.mesg = 'Correct packet data';
+
+    if (svccd === 'stat_info') {
+      packet.output = func_query.stat_info(func_query.cpu_info(), func_query.mem_info());
+      socket.emit('am', packet);
+      console.log('####################'); console.log('Send packet to master'); console.log(packet);
+    };
+    if (svccd === 'stat_prcs') {
+      func_query.stat_prcs(function(result){
+        packet.output = result;
+        socket.emit('am', packet);
+        console.log('####################'); console.log('Send packet to master'); console.log(packet);
+      });
+    };
+    if (svccd === 'stat_net') {
+      func_query.stat_net( function (err, result) {
+        packet.output = result;
+        socket.emit('am', packet);
+        console.log('####################'); console.log('Send packet to master'); console.log(packet);
+      });
+    };
+    if (svccd === 'stat_ipcq') {
+      func_query.stat_ipcq( function (err, result) {
+        packet.output = result;
+        socket.emit('am', packet);
+        console.log('####################'); console.log('Send packet to master'); console.log(packet);
+      });
+    };
+    if (svccd === 'stat_ipcm') {
+      func_query.stat_ipcm( function (err, result) {
+        packet.output = result[0];
+        socket.emit('am', packet);
+        console.log('####################'); console.log('Send packet to master'); console.log(packet);
+      });
+    };
+    if (svccd === 'stat_disk') {
+      func_query.stat_disk( function (result) {
+        packet.output = result;
+        socket.emit('am', packet);
+        console.log('####################'); console.log('Send packet to master'); console.log(packet);
+      });
+    }
+  }
+});
+
 //DB QUERY
 //#########################################################################################################
 //#########################################################################################################
@@ -23,6 +88,10 @@ setInterval(function (){
       if (session.svrkey) {
         //CPU - CPU
         func_query.stat_prcs(function(result){
+          if(!result) {
+            return;
+          }
+
           var packet = {head: {}, input: {}, output: {}, error: {}};
           var us = os.loadavg();
 
@@ -41,6 +110,9 @@ setInterval(function (){
 
         //USAGE -MEMORY
         func_query.usage_mem(function(result){
+          if(!result) {
+            return;
+          }
           var packet = {head: {}, input: {}, output: {}, error: {}};
           var mem_usage = result[0].used - result[0].buffers - result[0].cached;
           var swap_used = result[1].used / result[1].total;
@@ -57,6 +129,9 @@ setInterval(function (){
 
         //NETWROK - TCP
         func_query.usage_tcp(function(result){
+          if(!result) {
+            return;
+          }
           var packet = {head: {}, input: {}, output: {}, error: {}};
           var arr = Object.keys(result);
 
@@ -130,6 +205,10 @@ setInterval(function (){
 
         //DISK
         func_query.usage_disk(function(result){
+          if(!result) {
+            return;
+          };
+
           var packet = {head: {}, input: {}, output: {}, error: {}};
           var usage = result;
 
@@ -149,192 +228,6 @@ setInterval(function (){
     }
   })(socket))
 },60000);
-
 socket.on('db_query_result', function (message) {
   console.log('####################'); console.log('Receive packet from master'); console.log(message);
-});
-
-//DIRECT QUERY
-//#########################################################################################################
-//#########################################################################################################
-//#########################################################################################################
-socket.on('ma', function (message) {
-  var packet = {head: {},input: {},output: {}, error: {}
-  };
-  console.log('####################');
-  console.log('Receive packet from master');//DIRECT QUERY
-  console.log(message);
-
-  packet.head.login_token = message.head.login_token;
-  packet.head.svccd = message.head.svccd;
-  packet.head.query_type = message.head.query_type;
-  packet.head.svrkey = session.svrkey;
-
-  if (message.head.dstkey !== session.svrkey) {
-    packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
-  } else {
-    var svccd = packet.head.svccd;
-    packet.error.code = 0; packet.error.mesg = 'Correct packet data';
-
-    if (svccd === 'stat_info') {
-      packet.output = func_query.stat_info(func_query.cpu_info(), func_query.mem_info());
-      socket.emit('am', packet);
-      console.log('####################'); console.log('Send packet to master'); console.log(packet);
-    };
-    if (svccd === 'stat_prcs') {
-      func_query.stat_prcs(function(result){
-        packet.output = result;
-        socket.emit('am', packet);
-        console.log('####################'); console.log('Send packet to master'); console.log(packet);
-      });
-    }
-  }
-
-});
-
-// socket.on('stat_prcs_ma', function (message) {
-//   var packet = {
-//     head: {},
-//     input: {},
-//     output: {},
-//     error: {}
-//   };
-//   console.log('####################');
-//   console.log('Receive packet from master');//DIRECT QUERY
-//   console.log(message);
-//
-//   packet.head.login_token = message.head.login_token;
-//   packet.head.svccd = message.head.svccd;
-//   packet.head.query_type = message.head.query_type;
-//   packet.head.svrkey = session.svrkey;
-//
-//   if (message.head.dstkey !== session.svrkey) {
-//     packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
-//   } else {
-//     func_query.stat_prcs(function(result){
-//       packet.error.code = 0; packet.error.mesg = 'Correct packet data';
-//       packet.output = result;
-//       socket.emit('stat_prcs_am', packet);
-//       console.log('####################'); console.log('Send packet to master'); console.log(packet);
-//     });
-//   }
-// });
-
-socket.on('stat_net_ma', function (message) {
-  var packet = {
-    head: {},
-    input: {},
-    output: {},
-    error: {}
-  };
-  console.log('####################');
-  console.log('Receive packet from master');//DIRECT QUERY
-  console.log(message);
-
-  packet.head.login_token = message.head.login_token;
-  packet.head.svccd = message.head.svccd;
-  packet.head.query_type = message.head.query_type;
-  packet.head.svrkey = session.svrkey;
-
-  if (message.head.dstkey !== session.svrkey) {
-    packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
-    socket.emit('stat_net_am', packet);
-    console.log('####################'); console.log('Send packet to master'); console.log(packet);
-  } else {
-    func_query.stat_net( function (err, result) {
-      packet.error.code = 0; packet.error.mesg = 'Correct packet data';
-      packet.output = result;
-      socket.emit('stat_net_am', packet);
-      console.log('####################'); console.log('Send packet to master'); console.log(packet);
-    });
-  }
-
-});
-socket.on('stat_ipcq_ma', function (message) {
-  var packet = {
-    head: {},
-    input: {},
-    output: {},
-    error: {}
-  };
-  console.log('####################');
-  console.log('Receive packet from master');//DIRECT QUERY
-  console.log(message);
-
-  packet.head.login_token = message.head.login_token;
-  packet.head.svccd = message.head.svccd;
-  packet.head.query_type = message.head.query_type;
-  packet.head.svrkey = session.svrkey;
-
-  if (message.head.dstkey !== session.svrkey) {
-    packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
-    socket.emit('stat_ipcq_am', packet);
-    console.log('####################'); console.log('Send packet to master'); console.log(packet);
-  } else {
-    func_query.stat_ipcq( function (err, result) {
-      packet.error.code = 0; packet.error.mesg = 'Correct packet data';
-      packet.output = result;
-      socket.emit('stat_ipcq_am', packet);
-      console.log('####################'); console.log('Send packet to master'); console.log(packet);
-    });
-  }
-});
-socket.on('stat_ipcm_ma', function (message) {
-  var packet = {
-    head: {},
-    input: {},
-    output: {},
-    error: {}
-  };
-  console.log('####################');
-  console.log('Receive packet from master');//DIRECT QUERY
-  console.log(message);
-
-  packet.head.login_token = message.head.login_token;
-  packet.head.svccd = message.head.svccd;
-  packet.head.query_type = message.head.query_type;
-  packet.head.svrkey = session.svrkey;
-
-  if (message.head.dstkey !== session.svrkey) {
-    packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
-    socket.emit('stat_ipcm_am', packet);
-    console.log('####################'); console.log('Send packet to master'); console.log(packet);
-  } else {
-    func_query.stat_ipcm( function (err, result) {
-      packet.error.code = 0; packet.error.mesg = 'Correct packet data';
-      packet.output = result[0];
-      socket.emit('stat_ipcm_am', packet);
-      console.log('####################'); console.log('Send packet to master'); console.log(packet);
-    });
-  }
-});
-socket.on('stat_disk_ma', function (message) {
-  var packet = {
-    head: {},
-    input: {},
-    output: {},
-    error: {}
-  };
-  console.log('####################');
-  console.log('Receive packet from master');//DIRECT QUERY
-  console.log(message);
-
-  packet.head.login_token = message.head.login_token;
-  packet.head.svccd = message.head.svccd;
-  packet.head.query_type = message.head.query_type;
-  packet.head.svrkey = session.svrkey;
-
-  if (message.head.dstkey !== session.svrkey) {
-    packet.error.code = 101; packet.error.mesg = 'Incorrect packet data';
-    socket.emit('stat_disk_am', packet);
-    console.log('####################'); console.log('Send packet to master'); console.log(packet);
-  } else {
-    func_query.stat_disk( function (result) {
-      packet.error.code = 0; packet.error.mesg = 'Correct packet data';
-      packet.output = result;
-      socket.emit('stat_disk_am', packet);
-      console.log('####################'); console.log('Send packet to master'); console.log(packet);
-    });
-  }
-
 });
