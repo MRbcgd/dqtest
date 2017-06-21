@@ -10,9 +10,7 @@ var socket = io.connect('http://' + host + ':' + port, { reconnect: true } );//R
 var func_socket = require('./func_socket');//ABOUT SOCKET
 var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
-func_query.usage_tcp(function(result){
-  console.log(result);
-})
+
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
 
@@ -85,6 +83,47 @@ socket.on('ma', function (message) {
 //#########################################################################################################
 //#########################################################################################################
 //#########################################################################################################
+
+function cpuAverage() {
+
+  //Initialise sum of idle and time of cores and fetch CPU info
+  var totalIdle = 0, totalTick = 0;
+  var cpus = os.cpus();
+
+  //Loop through CPU cores
+  for(var i = 0, len = cpus.length; i < len; i++) {
+
+    //Select CPU core
+    var cpu = cpus[i];
+
+    //Total up the time in the cores tick
+    for(type in cpu.times) {
+      totalTick += cpu.times[type];
+   }
+
+    //Total up the idle time of the core
+    totalIdle += cpu.times.idle;
+  }
+
+  //Return the average Idle and Tick times
+  return {idle: totalIdle / cpus.length,  total: totalTick / cpus.length};
+}
+
+var startMeasure = cpuAverage();
+
+function get_cpuusage () {
+  var endMeasure = cpuAverage();
+
+  //Calculate the difference in idle and total time between the measures
+  var idleDifference = endMeasure.idle - startMeasure.idle;
+  var totalDifference = endMeasure.total - startMeasure.total;
+
+  //Calculate the average percentage CPU usage
+  var percentageCPU = 100 - (100 * idleDifference / totalDifference);
+
+  return percentageCPU;
+};
+
 setInterval(function (){
   process.nextTick((function(db_socket){
     return function () {
@@ -96,12 +135,14 @@ setInterval(function (){
           }
 
           var packet = {head: {}, input: {}, output: {}, error: {}};
-          var us = os.loadavg();
+
+          var us = get_cpuusage();
+          // var us = os.loadavg();
 
           packet.head.svccd = 'stat_prcs'; packet.head.query_type = 'db'; packet.head.svrkey = session.svrkey;
           packet.output.cpu = {
             date: new Date().toISOString().slice(0, 19).replace('T', ' '),
-            us: us[0],
+            us: us,
             prcs1_nm: result[0].cmmd, prcs1_us: Number(result[0].pcpu),
             prcs2_nm: result[1].cmmd, prcs2_us: Number(result[1].pcpu),
             prcs3_nm: result[2].cmmd, prcs3_us: Number(result[2].pcpu)
@@ -230,7 +271,7 @@ setInterval(function (){
       }
     }
   })(socket))
-},60000);
+},1000);
 socket.on('db_query_result', function (message) {
   console.log('####################'); console.log('Receive packet from master'); console.log(message);
 });

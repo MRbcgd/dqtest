@@ -1,6 +1,6 @@
-var default_ip = '192.168.20.129';
+var default_ip = '127.0.0.1';
 // var default_ip = '192.168.122.1';
-
+//toISOString()
 module.exports.ip_check = function (socket) {
   //IP CHECK
   socket.on('ip_check', function (message) {

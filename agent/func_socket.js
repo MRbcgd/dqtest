@@ -12,7 +12,7 @@ module.exports.conn_socket = function (socket) {
   });
 };
 module.exports.ip_check = function (socket) {
-  socket.emit('ip_check', { data: ip.address() });//IP CHECK
+  socket.emit('ip_check', { data: '127.0.0.1' });//IP CHECK
   socket.on('ip_result', function (message) {//IP RESULT
 
     if (message.data === 'fail') {

@@ -8,21 +8,21 @@ var session = require('express-session');
 var socketio = require('socket.io');//CONNECT WITH CLIENT
 var mysql = require('mysql');
 
-// var conn = mysql.createConnection({
-//     host: 'localhost',
-//     port: 3306,
-//     user: 'root',
-//     password: 'qkrcjfgud12',
-//     database: 'server_monitoring',
-//     multipleStatements: true
-// });
 var conn = mysql.createConnection({
     host: 'localhost',
-    user: 'pchpch',
-    password: 'cs2017!Q@W#E$R',
+    port: 3306,
+    user: 'root',
+    password: 'qkrcjfgud12',
     database: 'server_monitoring',
     multipleStatements: true
 });
+// var conn = mysql.createConnection({
+//     host: 'localhost',
+//     user: 'pchpch',
+//     password: 'cs2017!Q@W#E$R',
+//     database: 'server_monitoring',
+//     multipleStatements: true
+// });
 conn.connect(function(err) {
   if (err) {
     console.error('error connecting: ' + err.stack);
@@ -108,13 +108,23 @@ io.on("connection",function(socket){
   });
 
   socket.on('clientQuery', function (data) {
-    if (data === 'usage_cpu') {
-      var sql = 'SELECT * FROM agentcpu WHERE svrkey = ?;';
+    if (data === 'agenttcp') {
+      var sql = 'SELECT A.svrkey, A.idate, A.eth, A.rcv, A.snd, B.eth eth_v, B.rcv v_rcv, B.snd v_snd FROM agenttcp A LEFT OUTER JOIN agenttcp AS B ON A.idate = B.idate WHERE A.eth = `enp2s0`  AND A.eth <> B.eth AND svrkey = ?';
       conn.query(sql ,[ dstkey ], function(err, result){
         if(err){
           throw err;
         }
-
+        io.sockets.emit('serverSent', result);
+        console.log('####################'); console.log('DB QUERY: SELECT * FROM agentcpu WHERE svrkey = ' + dstkey)
+        // console.log(result);
+      })
+    }
+    else {
+      var sql = 'SELECT * FROM ' + data + ' WHERE svrkey = ?;';
+      conn.query(sql ,[ dstkey ], function(err, result){
+        if(err){
+          throw err;
+        }
         io.sockets.emit('serverSent', result);
         console.log('####################'); console.log('DB QUERY: SELECT * FROM agentcpu WHERE svrkey = ' + dstkey)
         // console.log(result);

@@ -8,33 +8,54 @@
   <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
   <link rel="stylesheet" href="stylesheets/style.css">
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src='/socket.io/socket.io.js'></script>
   <script type="text/javascript">
-  google.charts.load('current', {'packages':['annotationchart']});
-google.charts.setOnLoadCallback(drawChart);
+  google.charts.load('current', {'callback': init, 'packages':['annotationchart']});
+  google.charts.setOnLoadCallback(drawChart);
 
-function drawChart() {
+function init () {
+  var socket = io.connect();
+
+  // socket.emit('join','stat_prcs');
+  socket.emit('clientQuery','agentmemory');
+  socket.on('serverSent', function (message) {
+    // alert(JSON.stringify(message));
+    // var processData = processData(message);
+    drawChart(message);
+  });
+}
+function drawChart(message) {
+  var idate,year,month,date,hour,us,swap;
+
+  var result = [];
+  var arr = [];
+
+  for (var i = 0; i < message.length; i++) {
+    idate = message[i].idate;
+    year = idate.substr(0,4);
+    month = (Number(idate.substr(5,2)) - 1).toString();//0~11
+    date = idate.substr(8,2);
+    hour = idate.substr(11,2);
+    minute = idate.substr(14,2);
+    us = message[i].us;
+    swap = message[i].swap;
+
+    arr=[new Date(year, month, date, hour, minute), us,undefined,undefined,swap,undefined,undefined];
+    result.push(arr);
+  }
+
   var data = new google.visualization.DataTable();
+
   data.addColumn('date', 'Date');
-  data.addColumn('number', 'Kepler-22b mission');
-  data.addColumn('string', 'Kepler title');
-  data.addColumn('string', 'Kepler text');
-  data.addColumn('number', 'Gliese 163 mission');
-  data.addColumn('string', 'Gliese title');
-  data.addColumn('string', 'Gliese text');
-  data.addRows([
-    [new Date(2314, 2, 15), 12400, undefined, undefined,
-                            10645, undefined, undefined],
-    [new Date(2314, 2, 16), 24045, 'Lalibertines', 'First encounter',
-                            12374, undefined, undefined],
-    [new Date(2314, 2, 17), 35022, 'Lalibertines', 'They are very tall',
-                            15766, 'Gallantors', 'First Encounter'],
-    [new Date(2314, 2, 18), 12284, 'Lalibertines', 'Attack on our crew!',
-                            34334, 'Gallantors', 'Statement of shared principles'],
-    [new Date(2314, 2, 19), 8476, 'Lalibertines', 'Heavy casualties',
-                            66467, 'Gallantors', 'Mysteries revealed'],
-    [new Date(2314, 2, 20), 0, 'Lalibertines', 'All crew lost',
-                            79463, 'Gallantors', 'Omniscience achieved']
-  ]);
+  data.addColumn('number', 'Memory Usage');
+  data.addColumn('string', 'memory title');
+  data.addColumn('string', 'memory text');
+  data.addColumn('number', 'Swap');
+  data.addColumn('string', 'swap title');
+  data.addColumn('string', 'swap text');
+
+
+  data.addRows(result);
 
   var chart = new google.visualization.AnnotationChart(document.getElementById('chart_div'));
 

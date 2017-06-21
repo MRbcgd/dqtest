@@ -8,30 +8,63 @@
   <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
   <link rel="stylesheet" href="stylesheets/style.css">
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript">      google.charts.load('current', {'packages':['annotationchart']});
+  <script type="text/javascript">
+      google.charts.load('current', {'callback': init,'packages':['annotationchart']});
       google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart() {
+      function init () {
+        var socket = io.connect();
+
+        // socket.emit('join','stat_prcs');
+        socket.emit('clientQuery','agenttcp');
+        socket.on('serverSent', function (message) {
+          // alert(JSON.stringify(message));
+          // var processData = processData(message);
+          drawChart(message);
+        });
+      }
+
+      function drawChart(message) {
+        var idate,year,month,date,hour,minute,eth,rcv,snd,eth_v,v_rcv,v_snd;
+        var result = [];
+        var arr = [];
+
+        for (var i = 0; i < message.length; i++) {
+          idate = message[i].idate;
+          year = idate.substr(0,4);
+          month = (Number(idate.substr(5,2)) - 1).toString();//0~11
+          date = idate.substr(8,2);
+          hour = idate.substr(11,2);
+          minute = idate.substr(14,2);
+          // eth = message[i].eth;
+          rcv = message[i].rcv;
+          snd = message[i].snd;
+          // eth_v = message[i].eth_v;
+          v_rcv = message[i].v_rcv;
+          v_snd = message[i].v_snd;
+
+          arr=[new Date(year, month, date, hour, minute), rcv, undefined, undefined,
+                                  snd, undefined, undefined,
+                                  v_rcv, undefined, undefined,
+                                  v_snd, undefined, undefined];
+          result.push(arr);
+        }
+
         var data = new google.visualization.DataTable();
         data.addColumn('date', 'Date');
-        data.addColumn('number', 'Kepler-22b mission');
+        data.addColumn('number', 'enp2s0 Rcv');
         data.addColumn('string', 'Kepler title');
         data.addColumn('string', 'Kepler text');
-        data.addColumn('number', 'Gliese 163 mission');
+        data.addColumn('number', 'enp2s0 Snd');
         data.addColumn('string', 'Gliese title');
         data.addColumn('string', 'Gliese text');
-        data.addColumn('number', 'Gliese 163 mission');
+        data.addColumn('number', 'virbr0-nic Rcv');
         data.addColumn('string', 'Gliese title');
         data.addColumn('string', 'Gliese text');
-        data.addColumn('number', 'Gliese 163 mission');
+        data.addColumn('number', 'virbr0-nic snd');
         data.addColumn('string', 'Gliese title');
         data.addColumn('string', 'Gliese text');
-        data.addRows([
-          [new Date(2314, 2, 15), 12400, undefined, undefined,
-                                  10645, undefined, undefined,
-                                  13500, undefined, undefined,
-                                  13500, undefined, undefined]
-        ]);
+        data.addRows(result);
 
         var chart = new google.visualization.AnnotationChart(document.getElementById('chart_div'));
 

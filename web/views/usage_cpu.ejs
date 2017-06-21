@@ -18,7 +18,7 @@
       var socket = io.connect();
 
       // socket.emit('join','stat_prcs');
-      socket.emit('clientQuery','usage_cpu');
+      socket.emit('clientQuery','agentcpu');
       socket.on('serverSent', function (message) {
         // alert(JSON.stringify(message));
         // var processData = processData(message);
@@ -26,40 +26,40 @@
       });
     }
     function drawChart(message) {
+      var idate,year,month,date,hour,us,prcs1_nm,prcs2_nm,prcs3_nm,prcs1_us,prcs2_us,prcs3_us,prcs_nm,prcs_us;
 
-      var idate = message[0].idate;
-      var year = idate.substr(0,4);
-      var month = (Number(idate.substr(5,2)) - 1).toString();//0~11
-      var date = idate.substr(8,2);
-      var hour = idate.substr(11,2);
-      var minute = idate.substr(14,2);
-      var us = message[0].us;
-      alert(idate);
-      // var prcs1_nm = message[0].prcs1_nm;
-      // var prcs2_nm = message[1].prcs2_nm;
-      // var prcs3_nm = message[2].prcs3_nm;
-      // var prcs1_us = message[0].prcs1_us;
-      // var prcs2_us = message[1].prcs2_us;
-      // var prcs3_us = message[2].prcs3_us;
-      // var prcs_nm = prcs1_nm + ' ' + prcs2_nm + ' ' + prcs3_nm;
-      // var prcs_us = prcs1_us.toString() + ' ' + prcs2_us.toString() + ' ' + prcs3_us.toString();
-      // alert(month);
-      // var month = idate.getMonth();
-      // var day = idate.getDate();
-      // var hour = idate.getHours();
-      // var minute = idate.getMinutes();
+      var result = [];
+      var arr = [];
+
+      for (var i = 0; i < message.length; i++) {
+        idate = message[i].idate;
+        year = idate.substr(0,4);
+        month = (Number(idate.substr(5,2)) - 1).toString();//0~11
+        date = idate.substr(8,2);
+        hour = idate.substr(11,2);
+        minute = idate.substr(14,2);
+        us = message[i].us;
+        prcs1_nm = message[i].prcs1_nm;
+        prcs2_nm = message[i].prcs2_nm;
+        prcs3_nm = message[i].prcs3_nm;
+        prcs1_us = message[i].prcs1_us;
+        prcs2_us = message[i].prcs2_us;
+        prcs3_us = message[i].prcs3_us;
+        prcs_nm = prcs1_nm + ' ' + prcs2_nm + ' ' + prcs3_nm;
+        prcs_us = prcs1_us.toString() + ' ' + prcs2_us.toString() + ' ' + prcs3_us.toString();
+
+        arr = [new Date(year, month, date, hour, minute), us, prcs_nm, prcs_us];
+        result.push(arr);
+      }
 
       var data = new google.visualization.DataTable();
 
       data.addColumn('date', 'Date');
-      data.addColumn('number', 'Kepler-22b mission');
-      data.addColumn('string', 'Kepler title');
-      data.addColumn('string', 'Kepler text');
+      data.addColumn('number', 'CPU Usage');
+      data.addColumn('string', 'TOP3 Process');
+      data.addColumn('string', 'Process cpu usage');
 
-      data.addRows([
-        [new Date(year, month, date, hour, minute), us, prcs1_nm, '10 20 30']
-
-      ]);
+      data.addRows(result);
 
       var chart = new google.visualization.AnnotationChart(document.getElementById('chart_div'));
 
