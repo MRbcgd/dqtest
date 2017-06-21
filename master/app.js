@@ -15,10 +15,18 @@ var conn = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'qkrcjfgud12',
+    password: 'cs2017!Q@W#E$R',
     database: 'server_monitoring',
     multipleStatements: true
 });
+// var conn = mysql.createConnection({
+//     host: 'localhost',
+//     port: 3306,
+//     user: 'root',
+//     password: 'qkrcjfgud12',
+//     database: 'server_monitoring',
+//     multipleStatements: true
+// });
 conn.connect(function(err) {
   if (err) {
     console.error('error connecting: ' + err.stack);
@@ -79,7 +87,7 @@ io.sockets.on('connection', function(socket) {
 
       console.log('Send packet to web: ERR- INCORRECT DSTKEY');
     }
-    
+
   });
 
 // DB_QUERY
