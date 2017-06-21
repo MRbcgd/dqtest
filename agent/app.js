@@ -136,43 +136,43 @@ setInterval(function (){
             return;
           }
           var packet = {head: {}, input: {}, output: {}, error: {}};
-          var arr = Object.keys(result);
+          // var arr = Object.keys(result);
 
           packet.head.svccd = 'usage_tcp'; packet.head.query_type = 'db';packet.head.svrkey = session.svrkey;
 
-          for (var i = 0; i < arr.length; i++) {
-            if (arr[i] === 'ens33') {//TEST
+
+            if ( result['ens33'] ) {//TEST
               packet.output.tcp = {
                 date: new Date().toISOString().slice(0, 19).replace('T', ' '),
                 eth: 'ens33',
-                rcv: Number(result.ens33.bytes.receive),
-                snd: Number(result.ens33.bytes.transmit)
+                rcv: Number(result['ens33'].bytes.receive),
+                snd: Number(result['ens33'].bytes.transmit)
               };
               console.log('####################'); console.log('Send packet to master'); console.log(packet);
               db_socket.emit('db_query', packet);
             };
-            if (arr[i] === 'enp2s0') {
+            if (result['enp2s0']) {
               packet.output.tcp = {
                 date: new Date().toISOString().slice(0, 19).replace('T', ' '),
                 eth: 'enp2s0',
-                rcv: Number(result.enp2s0.bytes.receive),
-                snd: Number(result.enp2s0.bytes.transmit)
+                rcv: Number(result['enp2s0'].bytes.receive),
+                snd: Number(result['enp2s0'].bytes.transmit)
               };
               console.log('####################'); console.log('Send packet to master'); console.log(packet);
               db_socket.emit('db_query', packet);
             };
-            if (arr[i] === 'virbr0-nic') {
+            if (result['virbr0-nic']) {
               packet.output.tcp = {
                 date: new Date().toISOString().slice(0, 19).replace('T', ' '),
                 eth: 'virbr0-nic',
-                rcv: Number(result.virbr0-nic.bytes.receive),
-                snd: Number(result.virbr0-nic.bytes.transmit)
+                rcv: Number(result['virbr0-nic'].bytes.receive),
+                snd: Number(result['virbr0-nic'].bytes.transmit)
               };
 
               console.log('####################'); console.log('Send packet to master'); console.log(packet);
               db_socket.emit('db_query', packet);
             }
-          };
+
         });
 
         //IPCQ
