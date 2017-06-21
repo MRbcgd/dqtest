@@ -109,7 +109,7 @@ io.on("connection",function(socket){
 
   socket.on('clientQuery', function (data) {
     if (data === 'agenttcp') {
-      var sql = 'SELECT A.svrkey, A.idate, A.eth, A.rcv, A.snd, B.eth eth_v, B.rcv v_rcv, B.snd v_snd FROM agenttcp A LEFT OUTER JOIN agenttcp AS B ON A.idate = B.idate WHERE A.eth = ? AND A.eth <> B.eth AND svrkey = ?';
+      var sql = 'SELECT A.svrkey, A.idate, A.eth, A.rcv, A.snd, B.eth eth_v, B.rcv v_rcv, B.snd v_snd FROM agenttcp A LEFT OUTER JOIN agenttcp AS B ON A.idate = B.idate WHERE A.eth = ? AND A.eth <> B.eth AND A.svrkey = ?';
       conn.query(sql ,[ 'enp2s0',dstkey ], function(err, result){
         if(err){
           throw err;
