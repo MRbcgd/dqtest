@@ -5,7 +5,6 @@ var async = require('async');
 var exec = require('child_process').exec;
 var session = require('express-session');
 
-const local_ip = ip.address();//for test
 
 module.exports.cpu_info = function () {//get cpu resource
   var cpuinfo = require('proc-cpuinfo')();
@@ -291,6 +290,60 @@ module.exports.stat_net = function(callback) {
                 return callback(null, obj_net);
         });
 }
+module.exports.dateFormat = function(date, fstr, utc)
+{
+  utc = utc ? 'getUTC' : 'get';
+  return fstr.replace (/%[YmdHMS]/g, function (m) {
+    switch (m) {
+    case '%Y': return date[utc + 'FullYear'] (); // no leading zeros required
+    case '%m': m = 1 + date[utc + 'Month'] (); break;
+    case '%d': m = date[utc + 'Date'] (); break;
+    case '%H': m = date[utc + 'Hours'] (); break;
+    case '%M': m = date[utc + 'Minutes'] (); break;
+    case '%S': m = date[utc + 'Seconds'] (); break;
+    default: return m.slice (1); // unknown code, remove %
+    }
+    // add leading zero if required
+    return ('0' + m).slice (-2);
+  });
+}
+module.exports.decToHex = function(d, padding)
+{
+    var hex = Number(d).toString(16);
+    padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+
+    while (hex.length < padding) {
+        hex = "0" + hex;
+    }
+
+        hex = "0x" + hex;
+    return hex;
+}
+module.exports.getSysUser = function(myUid)
+{
+  var _passwd;
+        if( _passwd == null ) {
+                var passwd = fs.readFileSync('/etc/passwd', 'utf8');
+                _passwd = passwd.trim().split(/\n/);
+
+                console.log("read passwd ...");
+        }
+
+        var passwd = _passwd;
+        var items;
+        for (var i = 0, l = passwd.length; i < l; i++) {
+                if (passwd[i].charAt(0) === '#') continue;
+
+                items = passwd[i].split(':');
+                var otherName = items[0];
+                var otherUid  = items[2];
+                var otherGid  = items[3];
+                if( otherUid && (otherUid == myUid) ) {
+                                return otherName;
+                }
+        }
+        return '';
+}
 module.exports.stat_ipcq = function(callback){
         fs.readFile('/proc/sysvipc/msg', function(err,data) {
                 console.log("ipc-msg ------------------------------>\n");
@@ -304,7 +357,6 @@ module.exports.stat_ipcq = function(callback){
                         return callback(null, null);
 
                 }
-
                 data.toString().split("\n").forEach( function(line) {
                         if( loopcnt <= 0 ) {
                                 loopcnt++;
@@ -314,11 +366,11 @@ module.exports.stat_ipcq = function(callback){
 
                         line = line.trim();
                         if( line == null || line.length <= 0 ) {
-                                console.log('#######################');console.log('#######################');
-                                console.log("line length error... [" + line.length + "]");
-                                console.log('/proc/sysvipc/msg EMPTY!');
-                                console.log('#######################');console.log('#######################');
-                                return callback(null,null);
+                                // console.log('#######################');console.log('#######################');
+                                // console.log("line length error... [" + line.length + "]");
+                                // console.log('/proc/sysvipc/msg EMPTY!');
+                                // console.log('#######################');console.log('#######################');
+                                // return callback(null,null);
                         }
 
                         var obj_ipcq = {};
@@ -336,8 +388,7 @@ module.exports.stat_ipcq = function(callback){
                                 console.log("items.length < 7");
                                 return;
                         }
-
-                        obj_ipcq.key    = ustd.decToHex(items[0], 8); // "0x" + Number(items[0]).toString(16);
+                        obj_ipcq.key    = exports.decToHex(items[0], 8); // "0x" + Number(items[0]).toString(16);
                         obj_ipcq.msqid  = items[1];
                         obj_ipcq.perms  = items[2];
                         obj_ipcq.cbytes = items[3];
@@ -345,16 +396,15 @@ module.exports.stat_ipcq = function(callback){
 
                         obj_ipcq.lspid  = items[5];
                         obj_ipcq.lrpid  = items[6];
-                        obj_ipcq.owner  = ustd.getSysUser(items[7]);
+                        obj_ipcq.owner  = exports.getSysUser(items[7]);
 
-                        obj_ipcq.stime  = ustd.dateFormat(new Date(items[11]*1000), "%Y%m%d%H%M%S", false);
-                        obj_ipcq.rtime  = ustd.dateFormat(new Date(items[12]*1000), "%Y%m%d%H%M%S", false);
-                        obj_ipcq.ctime  = ustd.dateFormat(new Date(items[13]*1000), "%Y%m%d%H%M%S", false);
+                        obj_ipcq.stime  = exports.dateFormat(new Date(items[11]*1000), "%Y%m%d%H%M%S", false);
+                        obj_ipcq.rtime  = exports.dateFormat(new Date(items[12]*1000), "%Y%m%d%H%M%S", false);
+                        obj_ipcq.ctime  = exports.dateFormat(new Date(items[13]*1000), "%Y%m%d%H%M%S", false);
 
                         obj_arr[arrcnt] = obj_ipcq;
                         arrcnt++;
                 });
-
                 // console.log("ipc-msg=" + JSON.stringify(obj_arr) + "\n");
                 console.log("<------------------------------ ipc-msg\n");
                 return callback(null, obj_arr);
@@ -403,7 +453,7 @@ module.exports.stat_ipcm = function(callback){
                                 return;
                         }
                         // key
-                        obj_ipcm.key     = items[0];
+                        obj_ipcm.key     = exports.decToHex(items[0], 8);
                         obj_ipcm.shmid   = items[1];
                         obj_ipcm.perms   = items[2];
                         obj_ipcm.size    = items[3];

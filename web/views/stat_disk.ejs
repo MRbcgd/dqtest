@@ -14,11 +14,27 @@
     <script>
       $(document).ready(function(){
 
-        var socket = io.connect();
+        var socket = io();
+        socket.connect('http://localhost', {
+          'reconnection': true,
+          'reconnectionDelay': 500,
+          'reconnectionAttempts': 10
+        });
 
         socket.emit('list','stat_disk');
         socket.on('message', function (message) {
-          alert(JSON.stringify(message));
+          for (var i = 0; i < message.length; i++) {
+            var tr1 = '<tr>', tr2 = '</tr>',
+            fs = '<td>' + message[i].fs + '</td>',
+            blocks = '<td>' + message[i].blocks + '</td>',
+            used = '<td>' + message[i].used + '</td>',
+            available = '<td>' + message[i].available + '</td>',
+            us = '<td>' + message[i].us + '</td>',
+            mount = '<td>' + message[i].mount + '</td>'
+            var result = tr1 + fs  + blocks + used + available + us + mount + tr2;
+
+            $('#mytable > tbody:last').append(result);
+          }
         })
       });
 
@@ -47,42 +63,18 @@
       </div>
 
       <div class="container">
-        <table class="table table-fixed">
+        <table id="mytable" class="table table-fixed">
           <thead>
             <tr>
-              <th class="col-xs-3">PID</th>
-              <th class="col-xs-3">User</th>
-              <th class="col-xs-3">RES</th>
-              <th class="col-xs-3">CPU(%)</th>
-              <th class="col-xs-3">Time</th>
-              <th class="col-xs-3">Command</th>
+              <th class="col-xs-3">Filesystem</th>
+              <th class="col-xs-3">Blocks(1M)</th>
+              <th class="col-xs-3">Used</th>
+              <th class="col-xs-3">Avail</th>
+              <th class="col-xs-3">Use(%)</th>
+              <th class="col-xs-3">Mount</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-            </tr>
-            <tr>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-            </tr>
-            <tr>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-            </tr>
           </tbody>
         </table>
       </div>

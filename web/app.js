@@ -8,21 +8,21 @@ var session = require('express-session');
 var socketio = require('socket.io');//CONNECT WITH CLIENT
 var mysql = require('mysql');
 //
-// var conn = mysql.createConnection({
-//     host: 'localhost',
-//     port: 3306,
-//     user: 'root',
-//     password: 'qkrcjfgud12',
-//     database: 'server_monitoring',
-//     multipleStatements: true
-// });
 var conn = mysql.createConnection({
     host: 'localhost',
-    user: 'pchpch',
-    password: 'cs2017!Q@W#E$R',
+    port: 3306,
+    user: 'root',
+    password: 'qkrcjfgud12',
     database: 'server_monitoring',
     multipleStatements: true
 });
+// var conn = mysql.createConnection({
+//     host: 'localhost',
+//     user: 'pchpch',
+//     password: 'cs2017!Q@W#E$R',
+//     database: 'server_monitoring',
+//     multipleStatements: true
+// });
 conn.connect(function(err) {
   if (err) {
     console.error('error connecting: ' + err.stack);
@@ -108,14 +108,31 @@ io.on("connection",function(socket){
   });
 
   socket.on('clientQuery', function (data) {
-    if (data === 'agenttcp') {
+    if (data === 'usage_status') {
+      // var status;
+      // var cpu_usage = 'select us cpup from agentcpu where svrkey = ? order by idate desc limit 1;';
+      // var mem_usage = 'select us memp from agentmemory where svrkey =? order by idate desc limit 1;';
+      // var net_usage = 'select rcv, snd from agenttcp where svrkey =? order by idate desc limit 1;';
+      // var disk_usage = 'select us diskp from agentdisk where svrkey =? order by idate desc limit 1';
+      // var qnum = 'select qnum from agentipcq where svrkey = ? order by idate desc limit 1;';
+      //
+      // conn.query(cpu_usage ,[ dstkey ], function(err, result){if(err) throw err; });
+      // conn.query(mem_usage ,[ dstkey ], function(err, result){if(err) throw err;  });
+      // conn.query(net_usage ,[ dstkey ], function(err, result){if(err) throw err; });
+      // conn.query(disk_usage ,[ dstkey ], function(err, result){if(err) throw err; });
+      // conn.query(qnum ,[ dstkey ], function(err, result){if(err) throw err; });
+      // console.log(status);
+      // io.sockets.emit('serverSent', status);
+      // console.log('####################'); console.log('DB QUERY')
+    }
+    else if (data === 'agenttcp') {
       var sql = 'SELECT A.svrkey, A.idate, A.eth, A.rcv, A.snd, B.eth eth_v, B.rcv v_rcv, B.snd v_snd FROM agenttcp A LEFT OUTER JOIN agenttcp AS B ON A.idate = B.idate WHERE A.eth = ? AND A.eth <> B.eth AND A.svrkey = ?';
       conn.query(sql ,[ 'enp2s0',dstkey ], function(err, result){
         if(err){
           throw err;
         }
         io.sockets.emit('serverSent', result);
-        console.log('####################'); console.log('DB QUERY: SELECT * FROM agentcpu WHERE svrkey = ' + dstkey)
+        console.log('####################'); console.log('DB QUERY')
         // console.log(result);
       })
     }
@@ -126,7 +143,7 @@ io.on("connection",function(socket){
           throw err;
         }
         io.sockets.emit('serverSent', result);
-        console.log('####################'); console.log('DB QUERY: SELECT * FROM agentcpu WHERE svrkey = ' + dstkey)
+        console.log('####################'); console.log('DB QUERY')
         // console.log(result);
       })
     }

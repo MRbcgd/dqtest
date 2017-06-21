@@ -15,7 +15,12 @@
     google.charts.setOnLoadCallback(drawChart);
 
     function init () {
-      var socket = io.connect();
+      var socket = io();
+      socket.connect('http://localhost', {
+        'reconnection': true,
+        'reconnectionDelay': 500,
+        'reconnectionAttempts': 10
+      });
 
       // socket.emit('join','stat_prcs');
       socket.emit('clientQuery','agentcpu');

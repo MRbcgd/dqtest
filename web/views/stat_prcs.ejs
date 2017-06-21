@@ -12,15 +12,29 @@
     <script src='/socket.io/socket.io.js'></script>
 
     <script>
-    $(function(){
-      var socket = io.connect();
-
-      // socket.emit('join','stat_prcs');
-      socket.emit('list','stat_prcs');
-
-      socket.on('message', function (message) {
-        alert(JSON.stringify(message));
+    $(document).ready(function(){
+      var socket = io();
+      socket.connect('http://localhost', {
+        'reconnection': true,
+        'reconnectionDelay': 500,
+        'reconnectionAttempts': 10
       });
+
+      socket.emit('list','stat_prcs');
+      socket.on('message', function (message) {
+        for (var i = 0; i < message.length; i++) {
+          var tr1 = '<tr>', tr2 = '</tr>',
+          pid = '<td>' + message[i].pid + '</td>',
+          user = '<td>' + message[i].user + '</td>',
+          res = '<td>' + message[i].res + '</td>',
+          pcpu = '<td>' + message[i].pcpu + '</td>',
+          time = '<td>' + message[i].time + '</td>',
+          cmmd = '<td>' + message[i].cmmd + '</td>',
+          result = tr1 + pid + user + res + pcpu + time + cmmd + tr2;
+
+          $('#mytable > tbody:last').append(result);
+        }
+      })
     });
 
     </script>
@@ -49,7 +63,7 @@
       </div>
 
       <div class="container">
-        <table class="table table-fixed">
+        <table id="mytable" class="table table-fixed">
           <thead>
             <tr>
               <th class="col-xs-3">PID</th>
@@ -61,7 +75,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <!-- <tr>
               <td class="col-xs-3">data</td>
               <td class="col-xs-3">data</td>
               <td class="col-xs-3">data</td>
@@ -84,7 +98,7 @@
               <td class="col-xs-3">data</td>
               <td class="col-xs-3">data</td>
               <td class="col-xs-3">data</td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
       </div>

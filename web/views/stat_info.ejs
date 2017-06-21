@@ -15,10 +15,24 @@
     $(document).ready(function(){
 
       var socket = io();
+      socket.connect('http://localhost', {
+        'reconnection': true,
+        'reconnectionDelay': 500,
+        'reconnectionAttempts': 10
+      });
 
       socket.emit('list','stat_info');
       socket.on('message', function (message) {
-        socket.disconnect();
+        $('#model_name').text(message.model_name);
+        $('#cpu_MHz').text(message.cpu_MHz);
+        $('#cache_size').text(message.cache_size);
+        $('#stepping').text(message.stepping);
+        $('#vendor_id').text(message.vendor_id);
+        $('#bogomips').text(message.bogomips);
+        $('#MemTotal').text(message.MemTotal);
+        $('#MemFree').text(message.MemFree);
+        $('#MemSwap').text(message.MemSwap);
+
       })
     });
 
@@ -59,39 +73,40 @@
           <tbody>
             <tr>
               <td id = 'test' class="col-xs-3">CPU Model</td>
+              <td id = 'model_name' class="col-xs-3"></td>
             </tr>
 
             <tr>
               <td class="col-xs-3">Frequency</td>
-              <td class="col-xs-3">data</td>
+              <td id = "cpu_MHz" class="col-xs-3"></td>
             </tr>
             <tr>
               <td class="col-xs-3">Cache size</td>
-              <td class="col-xs-3">data</td>
+              <td id = "cache_size" class="col-xs-3"></td>
             </tr>
             <tr>
               <td class="col-xs-3">Stepping</td>
-              <td class="col-xs-3">data</td>
+              <td id = "stepping" class="col-xs-3"></td>
             </tr>
             <tr>
               <td class="col-xs-3">Vendor ID</td>
-              <td class="col-xs-3">data</td>
+              <td id = "vendor_id" class="col-xs-3"></td>
             </tr>
             <tr>
               <td class="col-xs-3">Bogomips</td>
-              <td class="col-xs-3">data</td>
+              <td id = "bogomips" class="col-xs-3"></td>
             </tr>
             <tr>
               <td class="col-xs-3">Memory (total)</td>
-              <td class="col-xs-3">data</td>
+              <td id = "MemTotal" class="col-xs-3"></td>
             </tr>
             <tr>
               <td class="col-xs-3">Memory (free)</td>
-              <td class="col-xs-3">data</td>
+              <td id = "MemFree" class="col-xs-3"></td>
             </tr>
             <tr>
               <td class="col-xs-3">Memory (swap)</td>
-              <td class="col-xs-3">data</td>
+              <td id = "MemSwap" class="col-xs-3"></td>
             </tr>
 
           </tbody>

@@ -12,11 +12,42 @@
 
   <script>
   $(function(){
-    var socket = io.connect();
+    var socket = io();
+    socket.connect('http://localhost', {
+      'reconnection': true,
+      'reconnectionDelay': 500,
+      'reconnectionAttempts': 10
+    });
 
     socket.emit('list','stat_net');
     socket.on('message', function (message) {
-      alert(JSON.stringify(message));
+
+      for (var i = 0; i < message.tcp.length; i++) {
+        var tr1 = '<tr>', tr2 = '</tr>',
+        ntype = '<td>' + message.tcp[i].ntype + '</td>',
+        lip = '<td>' + message.tcp[i].lip + '</td>',
+        lport = '<td>' + message.tcp[i].lport + '</td>',
+        rip = '<td>' + message.tcp[i].rip + '</td>'
+        rport = '<td>' + message.tcp[i].rport + '</td>',
+        st = '<td>' + message.tcp[i].st + '</td>',
+        tx_queue = '<td>' + message.tcp[i].tx_queue + '</td>',
+        rx_queue = '<td>' + message.tcp[i].rx_queue+ '</td>'
+        var result = tr1 + ntype + lip + lport + rip + rport + st +  tx_queue + rx_queue + tr2;
+        $('#mytable > tbody:last').append(result);
+      };
+      for (var i = 0; i < message.udp.length; i++) {
+        var tr1 = '<tr>', tr2 = '</tr>',
+        ntype = '<td>' + message.udp[i].ntype + '</td>',
+        lip = '<td>' + message.udp[i].lip + '</td>',
+        lport = '<td>' + message.udp[i].lport + '</td>',
+        rip = '<td>' + message.udp[i].rip + '</td>'
+        rport = '<td>' + message.udp[i].rport + '</td>',
+        st = '<td>' + message.udp[i].st + '</td>',
+        tx_queue = '<td>' + message.udp[i].tx_queue + '</td>',
+        rx_queue = '<td>' + message.udp[i].rx_queue+ '</td>'
+        var result = tr1 + ntype + lip + lport + rip + rport + st +  tx_queue + rx_queue + tr2;
+        $('#mytable > tbody:last').append(result);
+      };
     })
   });
 
@@ -46,42 +77,20 @@
       </div>
 
       <div class="container">
-        <table class="table table-fixed">
+        <table id ="mytable" class="table table-fixed">
           <thead>
             <tr>
-              <th class="col-xs-3">PID</th>
-              <th class="col-xs-3">User</th>
-              <th class="col-xs-3">RES</th>
-              <th class="col-xs-3">CPU(%)</th>
-              <th class="col-xs-3">Time</th>
-              <th class="col-xs-3">Command</th>
+              <th class="col-xs-3">Type</th>
+              <th class="col-xs-3">Local IP</th>
+              <th class="col-xs-3">Port</th>
+              <th class="col-xs-3">Remove IP</th>
+              <th class="col-xs-3">Port</th>
+              <th class="col-xs-3">Status</th>
+              <th class="col-xs-3">RX</th>
+              <th class="col-xs-3">TX</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-            </tr>
-            <tr>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-            </tr>
-            <tr>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-              <td class="col-xs-3">data</td>
-            </tr>
           </tbody>
         </table>
       </div>

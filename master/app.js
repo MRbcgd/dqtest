@@ -11,21 +11,21 @@ const dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';
 const svrkey = 'a52ER2###@DFDDQQ$FBPF!#)';
 const login_token = 'login1';
 
-var conn = mysql.createConnection({
-    host: 'localhost',
-    user: 'pchpch',
-    password: 'cs2017!Q@W#E$R',
-    database: 'server_monitoring',
-    multipleStatements: true
-});
 // var conn = mysql.createConnection({
 //     host: 'localhost',
-//     port: 3306,
-//     user: 'root',
-//     password: 'qkrcjfgud12',
+//     user: 'pchpch',
+//     password: 'cs2017!Q@W#E$R',
 //     database: 'server_monitoring',
 //     multipleStatements: true
 // });
+var conn = mysql.createConnection({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: 'qkrcjfgud12',
+    database: 'server_monitoring',
+    multipleStatements: true
+});
 conn.connect(function(err) {
   if (err) {
     console.error('error connecting: ' + err.stack);
@@ -148,20 +148,22 @@ io.sockets.on('connection', function(socket) {
       //IPCQ
       if (message.head.svccd === 'stat_ipcq') {
         var sql = 'INSERT INTO agentipcq(svrkey, idate, qkey, qid, qnum, qbytes) VALUES (?,?,?,?,?,?);';
+          conn.query(sql ,[
+            svrkey,
+            message.output.queue.date,
+            Number(message.output.queue.key),
+            message.output.queue.msqid,
+            message.output.queue.qnum,
+            message.output.queue.cbytes,
 
-        conn.query(sql ,[
-          svrkey,
-          message.output.queue.date,
-          message.output.queue.key,
-          message.output.queue.msqid,
-          message.output.queue.cbytes,
-          message.output.queue.qnum
-        ], function(err){
-          if(err){
-            throw err;
-          }
-          console.log('####################'); console.log('DB QUERY: Insert data to table')
-        });
+          ], function(err){
+            if(err){
+              throw err;
+            }
+            console.log('####################'); console.log('DB QUERY: Insert data to table')
+          });
+
+
 
       };
       //DISK

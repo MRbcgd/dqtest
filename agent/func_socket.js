@@ -4,6 +4,7 @@ var session = require('express-session');
 module.exports.conn_socket = function (socket) {
   //CONNECT
   socket.on('connect', function() {
+    socket.emit('ip_check', { data: '127.0.0.1' });
     console.log('The socket network is connected');
   });
   //DISCONNECT
@@ -16,7 +17,7 @@ module.exports.ip_check = function (socket) {
   socket.on('ip_result', function (message) {//IP RESULT
 
     if (message.data === 'fail') {
-      socket.emit('ip_check', { data: ip.address() });
+      socket.emit('ip_check', { data: '127.0.0.1' });
 
       console.log('Inaccessible IP: Reconnect');
     } else {

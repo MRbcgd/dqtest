@@ -10,7 +10,9 @@ var socket = io.connect('http://' + host + ':' + port, { reconnect: true } );//R
 var func_socket = require('./func_socket');//ABOUT SOCKET
 var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
-
+func_query.stat_ipcq(function(err,result){
+  console.log(result);
+})
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
 
@@ -57,6 +59,7 @@ socket.on('ma', function (message) {
     };
     if (svccd === 'stat_ipcq') {
       func_query.stat_ipcq( function (err, result) {
+
         packet.output = result;
         socket.emit('am', packet);
         console.log('####################'); console.log('Send packet to master'); console.log(packet);
@@ -64,7 +67,7 @@ socket.on('ma', function (message) {
     };
     if (svccd === 'stat_ipcm') {
       func_query.stat_ipcm( function (err, result) {
-        packet.output = result[0];
+        packet.output = result;
         socket.emit('am', packet);
         console.log('####################'); console.log('Send packet to master'); console.log(packet);
       });
@@ -217,34 +220,37 @@ setInterval(function (){
         });
 
         //IPCQ
-        func_query.stat_ipcq(function(result){
+        func_query.stat_ipcq(function(err,result){
 
-          if(!result) {
+          if(!result){
             return;
           }
+            var packet = {head: {}, input: {}, output: {}, error: {}};
+            var max = result[0];
 
-          var packet = {head: {}, input: {}, output: {}, error: {}};
-          var key,msqid,cbytes,qnum=0;
+            for (var i = 0; i < result.length; i++) {
+              if (max.qnum < result[i].qnum) {
+                max = result[i];
+              }
+            };
 
-          for (var i = 0; i < result.length; i++) {
-            if (qnum < result[i].qnum) {
-              key = result[i].key;
-              msqid = result[i].msqid;
-              cbytes = result[i].cbytes;
-              qnum = result[i].qnum;
+
+            packet.head.svccd = 'stat_ipcq'; packet.head.query_type = 'db'; packet.head.svrkey = session.svrkey;
+            packet.output.queue = {
+              date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+              key: max.key,
+              msqid: max.msqid,
+              cbytes: max.cbytes,
+              qnum: max.qnum
             }
-          };
+            console.log('####################'); console.log('Send packet to master'); console.log(packet);
+            db_socket.emit('db_query', packet);
 
-          packet.head.svccd = 'stat_ipcq'; packet.head.query_type = 'db'; packet.head.svrkey = session.svrkey;
-          packet.output.queue = {
-            date: new Date().toISOString().slice(0, 19).replace('T', ' '),
-            key: key,
-            msqid: msqid,
-            cbytes: cbytes,
-            qnum: qnum
-          };
-          console.log('####################'); console.log('Send packet to master'); console.log(packet);
-          db_socket.emit('db_query', packet);
+            
+
+
+
+
         });
 
         //DISK
@@ -271,7 +277,7 @@ setInterval(function (){
       }
     }
   })(socket))
-},1000);
+},3000);
 socket.on('db_query_result', function (message) {
   console.log('####################'); console.log('Receive packet from master'); console.log(message);
 });
