@@ -8,24 +8,45 @@
   <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
   <link rel="stylesheet" href="stylesheets/style.css">
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script src='/socket.io/socket.io.js'></script>
   <script type="text/javascript">
-    google.charts.load('current', {'packages':['annotationchart']});
+    google.charts.load('current', {'callback': init, 'packages':['annotationchart']});
     google.charts.setOnLoadCallback(drawChart);
 
-    function drawChart() {
+    function init () {
+      var socket = io.connect();
+
+      // socket.emit('join','stat_prcs');
+      socket.emit('clientQuery','usage_cpu');
+      socket.on('serverSent', function (message) {
+        // alert(JSON.stringify(message));
+        // var processData = processData(message);
+        drawChart(message);
+      });
+    }
+    function drawChart(message) {
+
+      // var idate = message[0].idate;
+      // var year = idate.substr(0,4);
+      // var month = idate.substr(5,2);
+      // var date = idate.substr(8,2);
+      var idate = new Date();
+      alert(idate);
+      // var month = idate.getMonth();
+      // var day = idate.getDate();
+      // var hour = idate.getHours();
+      // var minute = idate.getMinutes();
+
       var data = new google.visualization.DataTable();
+
       data.addColumn('date', 'Date');
       data.addColumn('number', 'Kepler-22b mission');
       data.addColumn('string', 'Kepler title');
       data.addColumn('string', 'Kepler text');
 
       data.addRows([
-        [new Date(2314, 2, 15,10,30), 7, 'Sshd', '7.0%'],
-        [new Date(2314, 2, 15,10,31), 40, undefined, undefined],
-        [new Date(2314, 2, 15,10,32), 20, undefined, undefined],
-        [new Date(2314, 2, 15,10,33), 10, undefined, undefined],
-        [new Date(2314, 2, 15,10,34), 90, undefined, undefined],[new Date(2314, 2, 15,13,11), 11, undefined, undefined],
-
+        [new Date(2314, 02, 15,10,30), 7, 'node atom sshd', '10 20 30']
 
       ]);
 
@@ -69,7 +90,6 @@
   </div>
 
 </div>
-<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
 <script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
 
 <script src="javascripts/index.js"></script>

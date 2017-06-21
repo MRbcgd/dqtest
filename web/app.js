@@ -6,6 +6,23 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var socketio = require('socket.io');//CONNECT WITH CLIENT
+var mysql = require('mysql');
+
+var conn = mysql.createConnection({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: 'qkrcjfgud12',
+    database: 'server_monitoring',
+    multipleStatements: true
+});
+conn.connect(function(err) {
+  if (err) {
+    console.error('error connecting: ' + err.stack);
+    return;
+  }
+  console.log('connected as id ' + conn.threadId);
+});
 
 var client_socket = require('./conn_socket.js');//CONNECT WITH MASTER
 var index = require('./routes/index');
@@ -81,6 +98,21 @@ io.on("connection",function(socket){
     packet.head.svccd = data;
     client_socket.emit('wm', packet);//DIRECT QUERY WEB TO MASTER
     console.log('#####################'); console.log('Send packet to master'); console.log(packet);
+  });
+
+  socket.on('clientQuery', function (data) {
+    if (data === 'usage_cpu') {
+      var sql = 'SELECT * FROM agentcpu WHERE svrkey = ?;';
+      conn.query(sql ,[ dstkey ], function(err, result){
+        if(err){
+          throw err;
+        }
+
+        io.sockets.emit('serverSent', result);
+        console.log('####################'); console.log('DB QUERY: SELECT * FROM agentcpu WHERE svrkey = ' + dstkey)
+        // console.log(result);
+      })
+    }
   });
 
   socket.on('disconnect', function () {

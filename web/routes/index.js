@@ -2,10 +2,10 @@ var express = require('express');
 var fs = require('fs');
 var ejs = require('ejs');
 var socket = require('../conn_socket.js');
+var io = require('socket.io');
 var session = require('express-session');
 var router = express.Router();
 
-var conn = require('../conn_db.js');
 
 router.get('/', function(req, res, next) {
   var sess = req.session;
@@ -45,6 +45,7 @@ router.get('/signout', function(req, res, next) {
      }
      res.redirect('/')
    });
+   socket
  } else {
    res.redirect('/main')
  }
