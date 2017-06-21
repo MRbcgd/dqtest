@@ -10,7 +10,7 @@ var socket = io.connect('http://' + host + ':' + port, { reconnect: true } );//R
 var func_socket = require('./func_socket');//ABOUT SOCKET
 var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
-func_socket.usage_tcp(function(result){
+func_query.usage_tcp(function(result){
   console.log(result);
 })
 func_socket.conn_socket(socket);
