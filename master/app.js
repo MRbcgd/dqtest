@@ -11,21 +11,21 @@ const dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';
 const svrkey = 'a52ER2###@DFDDQQ$FBPF!#)';
 const login_token = 'login1';
 
-var conn = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'cs2017!Q@W#E$R',
-    database: 'server_monitoring',
-    multipleStatements: true
-});
 // var conn = mysql.createConnection({
 //     host: 'localhost',
-//     port: 3306,
 //     user: 'root',
-//     password: 'qkrcjfgud12',
+//     password: 'cs2017!Q@W#E$R',
 //     database: 'server_monitoring',
 //     multipleStatements: true
 // });
+var conn = mysql.createConnection({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: 'qkrcjfgud12',
+    database: 'server_monitoring',
+    multipleStatements: true
+});
 conn.connect(function(err) {
   if (err) {
     console.error('error connecting: ' + err.stack);

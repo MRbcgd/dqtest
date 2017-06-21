@@ -24,7 +24,7 @@ DEFAULT CHARACTER SET = utf8;
 CREATE TABLE IF NOT EXISTS `server_monitoring`.`agentdisk` (
   `svrkey` VARCHAR(32) NOT NULL,
   `idate` DATETIME NOT NULL,
-  `mount` VARCHAR(128) NULL,
+  `mount` VARCHAR(128) NOT NULL,
   `total` INT(11) NULL DEFAULT NULL,
   `us` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`svrkey`, `idate`, `mount`),
