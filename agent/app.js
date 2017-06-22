@@ -222,13 +222,15 @@ setInterval(function (){
 
         //IPCQ
         func_query.stat_ipcq(function(err,result){
+          var packet = {head: {}, input: {}, output: {}, error: {}};
+          var max = result[0];
 
           if(!result){
             return;
           }
-            var packet = {head: {}, input: {}, output: {}, error: {}};
-            var max = result[0];
-
+          if(max.key === undefined) {
+            return;
+          }
             for (var i = 0; i < result.length; i++) {
               if (max.qnum < result[i].qnum) {
                 max = result[i];
