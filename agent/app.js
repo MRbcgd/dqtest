@@ -160,7 +160,8 @@ setInterval(function (){
             return;
           }
           var packet = {head: {}, input: {}, output: {}, error: {}};
-          var mem_usage = result[0].used - result[0].buffers - result[0].cached;
+          var mem_usage = result[0].used
+          //  - result[0].buffers - result[0].cached;
           var swap_used = result[1].used / result[1].total;
           mem_usage /= result[0].total;
 
