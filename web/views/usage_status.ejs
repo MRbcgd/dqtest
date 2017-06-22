@@ -33,14 +33,18 @@
           });
         }
         function drawStuff(message) {
-          alert(JSON.stringify(message[4][0]));
+
+          var qnum = message[4][0];
+          if(qnum === undefined) {
+              qnum = 0;
+          }
           var data = new google.visualization.arrayToDataTable([
-            // ['Move', 'Percentage'],
-            // ["CPU Usage", message[0][0].cpup ],
-            // ["Memory Usage", message[1][0].memp ],
-            // ["Network Usage", (message[2][0].rcv + message[2][0].snd) / mother],
-            // ["Disk Usage", message[3][0].diskp],
-            // ["sysvIPC Count", message[4][0].qnum]
+            ['Move', 'Percentage'],
+            ["CPU Usage", message[0][0].cpup ],
+            ["Memory Usage", message[1][0].memp ],
+            ["Network Usage", (message[2][0].rcv + message[2][0].snd) / mother],
+            ["Disk Usage", message[3][0].diskp],
+            ["sysvIPC Count", qnum]
           ]);
 
           var options = {
