@@ -8,21 +8,21 @@ var session = require('express-session');
 var socketio = require('socket.io');//CONNECT WITH CLIENT
 var mysql = require('mysql');
 //
-var conn = mysql.createConnection({
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: 'qkrcjfgud12',
-    database: 'server_monitoring',
-    multipleStatements: true
-});
 // var conn = mysql.createConnection({
 //     host: 'localhost',
-//     user: 'pchpch',
-//     password: 'cs2017!Q@W#E$R',
+//     port: 3306,
+//     user: 'root',
+//     password: 'qkrcjfgud12',
 //     database: 'server_monitoring',
 //     multipleStatements: true
 // });
+var conn = mysql.createConnection({
+    host: 'localhost',
+    user: 'pchpch',
+    password: 'cs2017!Q@W#E$R',
+    database: 'server_monitoring',
+    multipleStatements: true
+});
 conn.connect(function(err) {
   if (err) {
     console.error('error connecting: ' + err.stack);
@@ -109,6 +109,18 @@ io.on("connection",function(socket){
 
   socket.on('clientQuery', function (data) {
     if (data === 'usage_status') {
+      var cpu_usage = 'select us cpup from agentcpu where svrkey = ? order by idate desc limit 1;';
+      var mem_usage = 'select us memp from agentmemory where svrkey =? order by idate desc limit 1;';
+      var net_usage = 'select rcv, snd from agenttcp where svrkey =? order by idate desc limit 1;';
+      var disk_usage = 'select us diskp from agentdisk where svrkey =? order by idate desc limit 1;';
+      var qnum = 'select qnum from agentipcq where svrkey = ? order by idate desc limit 1;';
+      var sql = cpu_usage + mem_usage + net_usage + disk_usage + qnum;
+      conn.query(sql, [ dstkey, dstkey, dstkey, dstkey, dstkey], function(err, result) {
+        if (err) throw err;
+
+        io.sockets.emit('serverSent', result);
+        console.log('####################'); console.log('DB QUERY')
+    });
       // var status;
       // var cpu_usage = 'select us cpup from agentcpu where svrkey = ? order by idate desc limit 1;';
       // var mem_usage = 'select us memp from agentmemory where svrkey =? order by idate desc limit 1;';

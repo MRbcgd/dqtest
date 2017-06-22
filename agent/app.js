@@ -1,3 +1,5 @@
+process.env.NODE_ENV = ( process.env.NODE_ENV && ( process.env.NODE_ENV ).trim().toLowerCase() == 'production' ) ? 'production' : 'development';
+
 var io = require('socket.io-client');
 var session = require('express-session');
 var os = require('os');
@@ -10,9 +12,6 @@ var socket = io.connect('http://' + host + ':' + port, { reconnect: true } );//R
 var func_socket = require('./func_socket');//ABOUT SOCKET
 var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 
-func_query.stat_ipcq(function(err,result){
-  console.log(result);
-})
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
 
@@ -144,7 +143,7 @@ setInterval(function (){
 
           packet.head.svccd = 'stat_prcs'; packet.head.query_type = 'db'; packet.head.svrkey = session.svrkey;
           packet.output.cpu = {
-            date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+            date : func_query.getWorldTime(+9),//KST
             us: us,
             prcs1_nm: result[0].cmmd, prcs1_us: Number(result[0].pcpu),
             prcs2_nm: result[1].cmmd, prcs2_us: Number(result[1].pcpu),
@@ -167,7 +166,9 @@ setInterval(function (){
 
           packet.head.svccd = 'usage_mem'; packet.head.query_type = 'db';packet.head.svrkey = session.svrkey;
           packet.output.memory = {
-            date: new Date().toISOString().slice(0, 19).replace('T', ' '), us: mem_usage * 100, swap: swap_used * 100
+            date : func_query.getWorldTime(+9),//KST
+             us: mem_usage * 100,
+            swap: swap_used * 100
           };
 
           console.log('####################'); console.log('Send packet to master'); console.log(packet);
@@ -187,7 +188,7 @@ setInterval(function (){
 
             if ( result['ens33'] ) {//TEST
               packet.output.tcp = {
-                date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                date : func_query.getWorldTime(+9),//KST
                 eth: 'ens33',
                 rcv: Number(result['ens33'].bytes.receive),
                 snd: Number(result['ens33'].bytes.transmit)
@@ -197,7 +198,7 @@ setInterval(function (){
             };
             if (result['enp2s0']) {
               packet.output.tcp = {
-                date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                date : func_query.getWorldTime(+9),//KST
                 eth: 'enp2s0',
                 rcv: Number(result['enp2s0'].bytes.receive),
                 snd: Number(result['enp2s0'].bytes.transmit)
@@ -207,7 +208,7 @@ setInterval(function (){
             };
             if (result['virbr0-nic']) {
               packet.output.tcp = {
-                date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                date : func_query.getWorldTime(+9),//KST
                 eth: 'virbr0-nic',
                 rcv: Number(result['virbr0-nic'].bytes.receive),
                 snd: Number(result['virbr0-nic'].bytes.transmit)
@@ -237,7 +238,7 @@ setInterval(function (){
 
             packet.head.svccd = 'stat_ipcq'; packet.head.query_type = 'db'; packet.head.svrkey = session.svrkey;
             packet.output.queue = {
-              date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+              date : func_query.getWorldTime(+9),//KST
               key: max.key,
               msqid: max.msqid,
               cbytes: max.cbytes,
@@ -245,11 +246,6 @@ setInterval(function (){
             }
             console.log('####################'); console.log('Send packet to master'); console.log(packet);
             db_socket.emit('db_query', packet);
-
-            
-
-
-
 
         });
 
@@ -264,7 +260,7 @@ setInterval(function (){
 
           packet.head.svccd = 'usage_disk'; packet.head.query_type = 'db'; packet.head.svrkey = session.svrkey;
           packet.output.disk = {
-            date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+            date : func_query.getWorldTime(+9),//KST
             mount: result.mount,
             total: result.total,
             us: result.us
@@ -277,7 +273,8 @@ setInterval(function (){
       }
     }
   })(socket))
-},3000);
+},60000);
+
 socket.on('db_query_result', function (message) {
   console.log('####################'); console.log('Receive packet from master'); console.log(message);
 });

@@ -15,6 +15,8 @@
         google.charts.load('current', {'callback': init,'packages':['bar']});
         google.charts.setOnLoadCallback(drawStuff);
 
+        const mother = 1000000000;//1G BIT = 1000000kbyte =  1000000000 byte
+
         function init () {
           var socket = io();
           socket.connect('http://localhost', {
@@ -26,20 +28,18 @@
           // socket.emit('join','stat_prcs');
           socket.emit('clientQuery','usage_status');
           socket.on('serverSent', function (message) {
-            // alert(JSON.stringify(message));
-            // var processData = processData(message);
-            // drawChart(message);
+
+            drawStuff(message)
           });
         }
-        function drawStuff() {
-          alert('hi');
+        function drawStuff(message) {
           var data = new google.visualization.arrayToDataTable([
             ['Move', 'Percentage'],
-            ["CPU Usage", 40],
-            ["Memory Usage", 88],
-            ["Network Usage", 50],
-            ["Disk Usage", 30],
-            ['sysvIPC Count', 12]
+            ["CPU Usage", message[0][0].cpup ],
+            ["Memory Usage", message[1][0].memp ],
+            ["Network Usage", (message[2][0].rcv + message[2][0].snd) / mother],
+            ["Disk Usage", message[3][0].diskp],
+            ["sysvIPC Count", message[4][0].qnum]
           ]);
 
           var options = {
@@ -50,7 +50,7 @@
               subtitle: 'percentage' },
             axes: {
               x: {
-                0: { side: 'top', label: 'White to move'} // Top x-axis.
+                0: { side: 'top', label: 'The current state of the server'} // Top x-axis.
               }
             },
             bar: { groupWidth: "90%" }
