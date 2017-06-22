@@ -223,14 +223,17 @@ setInterval(function (){
         //IPCQ
         func_query.stat_ipcq(function(err,result){
           var packet = {head: {}, input: {}, output: {}, error: {}};
-          var max = result[0];
+          var max = result;
 
           if(!result){
             return;
           }
-          if(max.key === undefined) {
+          if (result[0] === undefined) {
             return;
           }
+          // if(max.key === undefined) {
+          //   return;
+          // }
             for (var i = 0; i < result.length; i++) {
               if (max.qnum < result[i].qnum) {
                 max = result[i];

@@ -5,7 +5,6 @@ var async = require('async');
 var exec = require('child_process').exec;
 var session = require('express-session');
 
-
 module.exports.leadingZeros = function (n, digits) {//toString
   var zero = '';
   n = n.toString();
@@ -395,11 +394,11 @@ module.exports.stat_ipcq = function(callback){
 
                         line = line.trim();
                         if( line == null || line.length <= 0 ) {
-                                // console.log('#######################');console.log('#######################');
-                                // console.log("line length error... [" + line.length + "]");
-                                // console.log('/proc/sysvipc/msg EMPTY!');
-                                // console.log('#######################');console.log('#######################');
-                                // return callback(null,null);
+                                console.log('#######################');console.log('#######################');
+                                console.log("line length error... [" + line.length + "]");
+                                console.log('/proc/sysvipc/msg EMPTY!');
+                                console.log('#######################');console.log('#######################');
+                                return callback(null,null);
                         }
 
                         var obj_ipcq = {};
