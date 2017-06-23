@@ -10,7 +10,7 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   var sess = req.session;
 
-  if (sess.username) {
+  if (req.session.username) {
     res.redirect('/main');
   } else {
     res.render('index.ejs')
@@ -40,10 +40,10 @@ router.post('/signin', function(req, res, next) {
 router.get('/signout', function(req, res, next) {
   if( req.session.username) {
     req.session.destroy(function (err) {
-    req.session;
+     req.session;
     });
     res.redirect('/main');
- } else {
+  } else {
    res.redirect('/main')
  }
 });
@@ -61,7 +61,7 @@ router.get('/main', function(req, res, next) {
 router.get('/stat_info', function(req, res, next) {
   var sess = req.session;
 
-  if (sess.username) res.render('stat_info.ejs'); else res.redirect('/');
+  if (sess.username) res.render('stat_info.ejs'); else res.redirect('/main');
 });
 router.get('/usage_status', function(req, res, next) {
   var sess = req.session;
@@ -69,7 +69,7 @@ router.get('/usage_status', function(req, res, next) {
   if (sess.username) {
     res.render('usage_status.ejs');
   } else {
-    res.redirect('/');
+    res.redirect('/main');
   }
 });
 router.get('/usage_cpu', function(req, res, next) {
@@ -80,7 +80,7 @@ router.get('/usage_cpu', function(req, res, next) {
       username: sess.username
     });
   } else {
-    res.redirect('/');
+    res.redirect('/main');
   }
 });
 router.get('/stat_prcs', function(req, res, next) {
@@ -89,7 +89,7 @@ router.get('/stat_prcs', function(req, res, next) {
   if (sess.username) {
     res.render('stat_prcs.ejs');
   } else {
-    res.redirect('/');
+    res.redirect('/main');
   }
 });
 router.get('/usage_mem', function(req, res, next) {
@@ -100,7 +100,7 @@ router.get('/usage_mem', function(req, res, next) {
       username: sess.username
     });
   } else {
-    res.redirect('/');
+    res.redirect('/main');
   }
 });
 router.get('/usage_tcp', function(req, res, next) {
@@ -111,7 +111,7 @@ router.get('/usage_tcp', function(req, res, next) {
       username: sess.username
     });
   } else {
-    res.redirect('/');
+    res.redirect('/main');
   }
 });
 router.get('/stat_net', function(req, res, next) {
@@ -120,7 +120,7 @@ router.get('/stat_net', function(req, res, next) {
   if (sess.username) {
     res.render('stat_net.ejs')
   } else {
-    res.redirect('/');
+    res.redirect('/main');
   }
 });
 router.get('/stat_ipcq', function(req, res, next) {
@@ -130,7 +130,7 @@ router.get('/stat_ipcq', function(req, res, next) {
   if (sess.username) {
     res.render('stat_ipcq.ejs')
   } else {
-    res.redirect('/');
+    res.redirect('/main');
   }
 });
 router.get('/stat_ipcm', function(req, res, next) {
@@ -139,7 +139,7 @@ router.get('/stat_ipcm', function(req, res, next) {
   if (sess.username) {
     res.render('stat_ipcm.ejs');
   } else {
-    res.redirect('/');
+    res.redirect('/main');
   }
 });
 router.get('/usage_disk', function(req, res, next) {
@@ -150,7 +150,7 @@ router.get('/usage_disk', function(req, res, next) {
       username: sess.username
     });
   } else {
-    res.redirect('/');
+    res.redirect('/main');
   }
 });
 router.get('/stat_disk', function(req, res, next) {
@@ -159,7 +159,7 @@ router.get('/stat_disk', function(req, res, next) {
   if (sess.username) {
     res.render('stat_disk.ejs');
   } else {//URL DEFENCE
-    res.redirect('/');
+    res.redirect('/main');
   }
 });
 module.exports = router;
