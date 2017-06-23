@@ -26,7 +26,7 @@ router.post('/signin', function(req, res, next) {
 
   if ( user.username === 'admin' && user.password === 'cs2017' ) {
     req.session.username = user.username;
-    req.session.login_token = 'login1';//###NEED MAKING RULE MORE WEB CLIENT COMMING
+    sess.login_token = 'login1';//###NEED MAKING RULE MORE WEB CLIENT COMMING
     // sess.dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';
 
     socket.emit('join', sess.login_token);//PRIVATE COMMUNICATION
@@ -38,11 +38,14 @@ router.post('/signin', function(req, res, next) {
 
 });
 router.get('/signout', function(req, res, next) {
-  if( req.session.username) {
-    req.session.destroy(function (err) {
-    req.session;
-    });
-    res.redirect('/main');
+  if( req.session.username ) {
+    req.session.destroy(function(err){
+     if (err) {
+       throw err;
+     }
+     req.session;
+     res.redirect('/')
+   });
  } else {
    res.redirect('/main')
  }
