@@ -25,18 +25,16 @@ function init () {
   });
 }
 function drawChart(message) {
-  var idate,year,month,date, minute, hour,us,swap;
+  var us,swap;
 
   var result = [];
   var arr = [];
 
   for (var i = 0; i < message.length; i++) {
-    idate = message[i].idate;
-    year = idate.substr(0,4);
-    month = (Number(idate.substr(5,2)) - 1).toString();//0~11
-    date = idate.substr(8,2);
-    hour = idate.substr(11,2);
-    minute = idate.substr(14,2);
+
+    var time = utcToKst(message[i].idate);
+
+
     us = message[i].us;
     swap = message[i].swap;
 

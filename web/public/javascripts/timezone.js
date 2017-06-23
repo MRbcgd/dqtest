@@ -1,26 +1,19 @@
-function leadingZeros (n, digits) {//toString
-  var zero = '';
-  n = n.toString();
+function utcToKst (idate) {
+  var year = idate.substr(0,4);
+  var month = (Number(idate.substr(5,2)) - 1).toString();//0~11
+  var date = idate.substr(8,2);
+  var hour = idate.substr(11,2);
+  var minute = idate.substr(14,2);
 
-  if (n.length < digits) {
-    for (i = 0; i < digits - n.length; i++)
-      zero += '0';
-  }
-  return zero + n;
-}
-function getWorldTime (arr,tzOffset) { //KST
-  var now = new Date(arr[0],arr[1],arr[2],arr[3],arr[4]);
-  var tz = now.getTime() + (now.getTimezoneOffset() * 60000) + (tzOffset * 3600000);
-  now.setTime(tz);
+  //Thu Jun 22 2017 00:58:00 GMT+0900 (대한민국 표준시)
+  var utc = new Date(year,month,date,hour,minute);
+  utc.setHours(utc.getHours() + 9);
 
+  year = utc.getFullYear();
+  month = utc.getMonth();
+  date = utc.getDate();
+  hour = utc.getHours();
+  minute = utc.getMinutes();
 
-  var s =
-    leadingZeros(now.getFullYear(), 4) + '-' +
-    leadingZeros(now.getMonth() + 1, 2) + '-' +
-    leadingZeros(now.getDate(), 2) + ' ' +
-    leadingZeros(now.getHours(), 2) + ':' +
-    leadingZeros(now.getMinutes(), 2) + ':' +
-    leadingZeros(now.getSeconds(), 2);
-
-  return s;
-}
+    return new Date(year,month,date,hour,minute)
+};

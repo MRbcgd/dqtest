@@ -27,17 +27,12 @@
       }
 
       function drawChart(message) {
-        var idate,year,month,date,hour,minute,eth,rcv,snd,eth_v,v_rcv,v_snd;
+        var eth,rcv,snd,eth_v,v_rcv,v_snd;
         var result = [];
         var arr = [];
 
         for (var i = 0; i < message.length; i++) {
-          idate = message[i].idate;
-          year = idate.substr(0,4);
-          month = (Number(idate.substr(5,2)) - 1).toString();//0~11
-          date = idate.substr(8,2);
-          hour = idate.substr(11,2);
-          minute = idate.substr(14,2);
+          var time = utcToKst(message[i].idate);
           // eth = message[i].eth;
           rcv = message[i].rcv;
           snd = message[i].snd;
