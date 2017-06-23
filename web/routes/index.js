@@ -24,7 +24,7 @@ router.post('/signin', function(req, res, next) {
     password : req.body.password
   };
 
-  if ( user.username !== 'test' && user.password !== 'test') {
+  if ( user.username === 'admin' && user.password === 'cs2017' ) {
     sess.username = user.username;
     sess.login_token = 'login1';//###NEED MAKING RULE MORE WEB CLIENT COMMING
     // sess.dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';
