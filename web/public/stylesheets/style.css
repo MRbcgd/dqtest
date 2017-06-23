@@ -10,7 +10,14 @@
   overflow-y: hidden;
   background: #2c3e50;
 }
-
+/*/*/
+ul{
+    list-style:none;
+}
+ul :active {
+  color:white;
+}
+/**/
 #page-content-wrapper {
   width: 100%;
   position: absolute;
@@ -19,7 +26,6 @@
 
 #wrapper.menuDisplayed #sidebar-wrapper {
   width: 250px;
-
 }
 
 #wrapper.menuDisplayed .page-content-wrapper {

@@ -8,8 +8,8 @@ function leadingZeros (n, digits) {//toString
   }
   return zero + n;
 }
-function getWorldTime (date,tzOffset) { //KST
-  var now = new Date();
+function getWorldTime (arr,tzOffset) { //KST
+  var now = new Date(arr[0],arr[1],arr[2],arr[3],arr[4]);
   var tz = now.getTime() + (now.getTimezoneOffset() * 60000) + (tzOffset * 3600000);
   now.setTime(tz);
 
