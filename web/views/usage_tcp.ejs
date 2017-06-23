@@ -33,14 +33,15 @@
 
         for (var i = 0; i < message.length; i++) {
           var time = utcToKst(message[i].idate);
-          // eth = message[i].eth;
+          
+	  //eth = message[i].eth;
           rcv = message[i].rcv;
           snd = message[i].snd;
           // eth_v = message[i].eth_v;
           v_rcv = message[i].v_rcv;
           v_snd = message[i].v_snd;
 
-          arr=[new Date(year, month, date, hour, minute), rcv, undefined, undefined,
+          arr=[time, rcv, undefined, undefined,
                                   snd, undefined, undefined,
                                   v_rcv, undefined, undefined,
                                   v_snd, undefined, undefined];
@@ -107,6 +108,6 @@
 <script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
 
 <script src="javascripts/index.js"></script>
-
+<script src="javascripts/timezone.js"></script>
 </body>
 </html>
