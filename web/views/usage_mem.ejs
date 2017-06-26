@@ -31,14 +31,12 @@ function drawChart(message) {
   var arr = [];
 
   for (var i = 0; i < message.length; i++) {
-
     var time = utcToKst(message[i].idate);
-
 
     us = message[i].us;
     swap = message[i].swap;
 
-    arr=[new Date(year, month, date, hour, minute), us,undefined,undefined,swap,undefined,undefined];
+    arr=[time, us,undefined,undefined,swap,undefined,undefined];
     result.push(arr);
   }
 
@@ -99,6 +97,7 @@ function drawChart(message) {
 <script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
 
 <script src="javascripts/index.js"></script>
+<script src="javascripts/timezone.js"></script>
 
 </body>
 </html>

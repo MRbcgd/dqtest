@@ -23,6 +23,7 @@
 
         socket.emit('list','stat_ipcq');
         socket.on('message', function (message) {
+          // alert(JSON.stringify(message))
           for (var i = 0; i < message.length; i++) {
             var tr1 = '<tr>', tr2 = '</tr>',
             key = '<td>' + message[i].key + '</td>',

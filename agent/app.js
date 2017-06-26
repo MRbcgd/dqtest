@@ -224,7 +224,7 @@ setInterval(function (){
         //IPCQ
         func_query.stat_ipcq(function(err,result){
           var packet = {head: {}, input: {}, output: {}, error: {}};
-          var max = result;
+          var max = result[0];
 
           if(!result){
             return;

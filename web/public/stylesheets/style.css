@@ -40,3 +40,10 @@ ul :active {
 #wrapper #sidebar-wrapper {
   transition:  0.5s ease-in;
 }
+
+.chart-container {
+  position: relative;
+  margin: auto;
+  height: 80vh;
+  width: 80vw;
+}

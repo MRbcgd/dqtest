@@ -382,7 +382,8 @@ module.exports.stat_ipcq = function(callback){
 
                 if( err != null ) {
                         console.log("ipc-msg... err");
-                        return callback(null, null);
+                        callback(null, null);
+                        return;
 
                 }
                 data.toString().split("\n").forEach( function(line) {
@@ -394,11 +395,7 @@ module.exports.stat_ipcq = function(callback){
 
                         line = line.trim();
                         if( line == null || line.length <= 0 ) {
-                                console.log('#######################');console.log('#######################');
-                                console.log("line length error... [" + line.length + "]");
-                                console.log('/proc/sysvipc/msg EMPTY!');
-                                console.log('#######################');console.log('#######################');
-                                return callback(null,null);
+                          return;
                         }
 
                         var obj_ipcq = {};
