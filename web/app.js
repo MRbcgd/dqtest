@@ -5,26 +5,27 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-var socketio = require('socket.io');//CONNECT WITH CLIENT
+var socketio = require('socket.io'); //CONNECT WITH CLIENT
 var mysql = require('mysql');
 
-/*
+
+// var conn = mysql.createConnection({
+//     host: 'localhost',
+//     port: 3306,
+//     user: 'root',
+//     password: 'qkrcjfgud12',
+//     database: 'server_monitoring',
+//     multipleStatements: true
+// });
+
 var conn = mysql.createConnection({
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: 'qkrcjfgud12',
-    database: 'server_monitoring',
-    multipleStatements: true
+  host: 'localhost',
+  user: 'pchpch',
+  password: 'cs2017!Q@W#E$R',
+  database: 'server_monitoring',
+  multipleStatements: true
 });
-*/ 
- var conn = mysql.createConnection({
-     host: 'localhost',
-     user: 'pchpch',
-     password: 'cs2017!Q@W#E$R',
-     database: 'server_monitoring',
-     multipleStatements: true
- });
+
 conn.connect(function(err) {
   if (err) {
     console.error('error connecting: ' + err.stack);
@@ -33,13 +34,13 @@ conn.connect(function(err) {
   console.log('connected as id ' + conn.threadId);
 });
 
-var client_socket = require('./conn_socket.js');//CONNECT WITH MASTER
+var client_socket = require('./conn_socket.js'); //CONNECT WITH MASTER
 var index = require('./routes/index');
 var users = require('./routes/users');
 var app = express();
 
-const dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';//NOT YET
-const login_token = 'login1';//NOT YET
+const dstkey = 'a52ER2###@DFDDQQ$FBPF!#)'; //NOT YET
+const login_token = 'login1'; //NOT YET
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -48,7 +49,9 @@ app.set('view engine', 'ejs');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -84,9 +87,9 @@ app.io = io;
 
 var packet = {
   head: {
-    login_token : login_token,
-    svccd : null,
-    query_type : 'direct',
+    login_token: login_token,
+    svccd: null,
+    query_type: 'direct',
     dstkey: dstkey
   },
   input: {},
@@ -97,19 +100,21 @@ var packet = {
   }
 };
 
-io.on("connection",function(socket){
+io.on("connection", function(socket) {
 
-  socket.on('client',function(data){
+  socket.on('client', function(data) {
     console.log(data);
   });
 
-  socket.on('list', function(data){
+  socket.on('list', function(data) {
     packet.head.svccd = data;
-    client_socket.emit('wm', packet);//DIRECT QUERY WEB TO MASTER
-    console.log('#####################'); console.log('Send packet to master'); console.log(packet);
+    client_socket.emit('wm', packet); //DIRECT QUERY WEB TO MASTER
+    console.log('#####################');
+    console.log('Send packet to master');
+    console.log(packet);
   });
 
-  socket.on('clientQuery', function (data) {
+  socket.on('clientQuery', function(data) {
     if (data === 'usage_status') {
       var cpu_usage = 'select us cpup from agentcpu where svrkey = ? order by idate desc limit 1;';
       var mem_usage = 'select us memp from agentmemory where svrkey =? order by idate desc limit 1;';
@@ -117,47 +122,63 @@ io.on("connection",function(socket){
       var disk_usage = 'select us diskp from agentdisk where svrkey =? order by idate desc limit 1;';
       var qnum = 'select qnum from agentipcq where svrkey = ? order by idate desc limit 1;';
       var sql = cpu_usage + mem_usage + net_usage + disk_usage + qnum;
-      conn.query(sql, [ dstkey, dstkey, dstkey, dstkey, dstkey], function(err, result) {
+      conn.query(sql, [dstkey, dstkey, dstkey, dstkey, dstkey], function(err, result) {
         if (err) throw err;
 
         io.sockets.emit('serverSent', result);
-        console.log('####################'); console.log('DB QUERY')
-    });
-    }
-    else if (data === 'agenttcp') {
+        console.log('####################');
+        console.log('DB QUERY')
+      });
+    } else if (data === 'agenttcp') {
       var sql = 'SELECT A.svrkey, A.idate, A.eth, A.rcv, A.snd, B.eth eth_v, B.rcv v_rcv, B.snd v_snd FROM agenttcp A LEFT OUTER JOIN agenttcp AS B ON A.idate = B.idate WHERE A.eth = ? AND A.eth <> B.eth AND A.svrkey = ?';
-      conn.query(sql ,[ 'enp2s0',dstkey ], function(err, result){
-        if(err){
+      conn.query(sql, ['enp2s0', dstkey], function(err, result) {
+        if (err) {
           throw err;
         }
 
         io.sockets.emit('serverSent', result);
-        console.log('####################'); console.log('DB QUERY')
+        console.log('####################');
+        console.log('DB QUERY')
         // console.log(result);
       })
-    }
-    else {
+    } else if (data === 'agentcpu') {
+      var sql = 'select t1.a idate, t1.b us, t2.prcs1_nm, t2.prcs1_us, t2.prcs2_nm, t2.prcs2_us, t2.prcs3_nm, t2.prcs3_us from (select substr(idate,1,13) a, max(us) b, max(idate) c from agentcpu group by substr(idate,1,13) order by substr(idate,1,13) desc) t1 left outer join agentcpu t2 on t1.c=t2.idate order by t1.a desc limit 24;';
+      conn.query(sql, function(err, result) {
+        if (err) {
+          throw err;
+        }
+
+        io.sockets.emit('serverSent', result);
+        console.log('####################');
+        console.log('DB QUERY')
+        // console.log(result);
+      })
+    } else {
       var sql = 'SELECT * FROM ' + data + ' WHERE svrkey = ?;';
-      conn.query(sql ,[ dstkey ], function(err, result){
-        if(err){
+      conn.query(sql, [dstkey], function(err, result) {
+        if (err) {
           throw err;
         }
         io.sockets.emit('serverSent', result);
-        console.log('####################'); console.log('DB QUERY')
+        console.log('####################');
+        console.log('DB QUERY')
         // console.log(result);
       })
     }
   });
 
-  socket.on('disconnect', function () {
+  socket.on('disconnect', function() {
     console.log('User disconnected');
   });
 });
 
-client_socket.on('mw', function (message) {
-  console.log('#####################'); console.log('Receive packet from master'); console.log(message);
-  if ( message.error.code !== 0 ) {//REPRESENT PACKET
-    client_socket.emit('wm', packet); console.log('Send packet to master: ERR- REPRESENT');
+client_socket.on('mw', function(message) {
+  console.log('#####################');
+  console.log('Receive packet from master');
+  console.log(message);
+  if (message.error.code !== 0) { //REPRESENT PACKET
+    client_socket.emit('wm', packet);
+    console.log('Send packet to master: ERR- REPRESENT');
   } else {
     io.sockets.emit('message', message.output);
   }
