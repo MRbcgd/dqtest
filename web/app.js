@@ -143,6 +143,8 @@ io.on("connection", function(socket) {
       })
     } else if (data === 'agentcpu') {
       var sql = 'select t1.a idate, t1.b us, t2.prcs1_nm, t2.prcs1_us, t2.prcs2_nm, t2.prcs2_us, t2.prcs3_nm, t2.prcs3_us from (select substr(idate,1,13) a, max(us) b, max(idate) c from agentcpu group by substr(idate,1,13) order by substr(idate,1,13) desc) t1 left outer join agentcpu t2 on t1.c=t2.idate order by t1.a desc limit 24;';
+      //LAST CPU DATA
+      var sql = sql += 'select * from agentcpu order by idate desc limit 1;';
       conn.query(sql, function(err, result) {
         if (err) {
           throw err;

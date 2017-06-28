@@ -52,23 +52,39 @@
           function drawChart(message) {
             var result = [];
             // 2017-06-26 22
-            for(var i in message) {
-                var idate = message[i].idate;
+            var past_data = message[0];
+            var last_data = message[1][0];
+
+            var time = utcToKst(last_data.idate);
+
+            result.push({
+              x: time,
+              y: last_data.us,
+              prcs1_nm: last_data.prcs1_nm,
+              prcs2_nm: last_data.prcs2_nm,
+              prcs3_nm: last_data.prcs3_nm,
+              prcs1_us: last_data.prcs1_us,
+              prcs2_us: last_data.prcs2_us,
+              prcs3_us: last_data.prcs3_us
+            });
+            
+            for(var i in past_data) {
+                var idate = past_data[i].idate;
                 var year = idate.substr(0,4);
                 var month = (Number(idate.substr(5,2)) -1 ).toString();
                 var date = idate.substr(8,2);
                 var hour = idate.substr(11,2);
                 result.push({
                   x: new Date(year, month, date, hour),
-                  y: message[i].us,
-                  prcs1_nm: message[i].prcs1_nm,
-                  prcs2_nm: message[i].prcs2_nm,
-                  prcs3_nm: message[i].prcs3_nm,
-                  prcs1_us: message[i].prcs1_us,
-                  prcs2_us: message[i].prcs2_us,
-                  prcs3_us: message[i].prcs3_us
+                  y: past_data[i].us,
+                  prcs1_nm: past_data[i].prcs1_nm,
+                  prcs2_nm: past_data[i].prcs2_nm,
+                  prcs3_nm: past_data[i].prcs3_nm,
+                  prcs1_us: past_data[i].prcs1_us,
+                  prcs2_us: past_data[i].prcs2_us,
+                  prcs3_us: past_data[i].prcs3_us
                 });
-            }
+            };
 
             var ctx = $('#myChart');
             var myChart = new Chart(ctx, {
