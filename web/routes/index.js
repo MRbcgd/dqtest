@@ -51,7 +51,7 @@ router.get('/main', function(req, res, next) {
   var sess = req.session;
 
   if (sess.username) {
-    res.render('main.ejs', {
+    res.render('usage_status.ejs', {
       username: sess.username
     });
   } else {

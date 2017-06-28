@@ -42,7 +42,7 @@
             <a href="#" class="btn btn-primary" id="menu-toggle">Menu</a>
             <!-- top  -->
             <% include ./top.ejs %>
-              <p>CPU</p>
+              <p>CPU Usage</p>
               <!--  -->
           </div>
           <div class="chart-container">
@@ -60,7 +60,13 @@
                 var hour = idate.substr(11,2);
                 result.push({
                   x: new Date(year, month, date, hour),
-                  y: message[i].us
+                  y: message[i].us,
+                  prcs1_nm: message[i].prcs1_nm,
+                  prcs2_nm: message[i].prcs2_nm,
+                  prcs3_nm: message[i].prcs3_nm,
+                  prcs1_us: message[i].prcs1_us,
+                  prcs2_us: message[i].prcs2_us,
+                  prcs3_us: message[i].prcs3_us
                 });
             }
 
@@ -69,8 +75,9 @@
               type: 'line',
               data: {
                 datasets: [{
-                  backgroundColor: 'transparent', //NO COLOR UNDER LINE
+                  backgroundColor: 'rgba(54, 162, 235, 1)', //NO COLOR UNDER LINE
                   borderColor: 'rgba(54, 162, 235, 1)',
+                  fill: false,
                   data: result
                 }]
               },
@@ -81,6 +88,24 @@
                 },
                 legend: {
                   display: false
+                },
+                tooltips: {
+                  callbacks: {
+                    label: function(tooltipItem, data) {
+                      return 'CPU Usage: ' + tooltipItem.yLabel + '%';
+                    },
+                    afterLabel: function(tooltipItem, data) {
+                      var data = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                      var multistringText = [''];
+
+                      multistringText.push('Command  |  CPU(%)');
+                      multistringText.push('  ' + '1) ' + data.prcs1_nm + ': ' + data.prcs1_us + '%');
+                      multistringText.push('  ' + '2) ' + data.prcs2_nm + ': ' + data.prcs2_us + '%');
+                      multistringText.push('  ' + '3) ' + data.prcs3_nm + ': ' + data.prcs3_us + '%');
+
+                      return multistringText;
+                    }
+                  }
                 },
                 scales: {
                   xAxes: [{
