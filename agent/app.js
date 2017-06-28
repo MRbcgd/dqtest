@@ -127,6 +127,10 @@ function get_cpuusage () {
   return percentageCPU;
 };
 
+setInterval(function(){
+	console.log(get_cpuusage());
+},1000);
+
 
 setInterval(function (){
   process.nextTick((function(db_socket){
