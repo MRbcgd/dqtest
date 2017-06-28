@@ -113,6 +113,7 @@ function cpuAverage() {
 }
 
 var startMeasure = cpuAverage();
+
 function get_cpuusage () {
   var endMeasure = cpuAverage();
 
@@ -127,10 +128,6 @@ function get_cpuusage () {
 };
 
 
-setInterval(function(){
-  console.log('cpuusage: ' + get_cpuusage());
-},1000);
-
 setInterval(function (){
   process.nextTick((function(db_socket){
     return function () {
@@ -144,6 +141,7 @@ setInterval(function (){
           var packet = {head: {}, input: {}, output: {}, error: {}};
 
           var us = get_cpuusage();
+          if (us > 0 && us < 1) us = 1;//ROUND OFF
           // var us = os.loadavg();
 
           packet.head.svccd = 'stat_prcs'; packet.head.query_type = 'db'; packet.head.svrkey = session.svrkey;
