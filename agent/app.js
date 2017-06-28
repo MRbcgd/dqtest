@@ -15,6 +15,7 @@ var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
 
+
 //DIRECT QUERY
 //#########################################################################################################
 //#########################################################################################################
@@ -112,7 +113,6 @@ function cpuAverage() {
 }
 
 var startMeasure = cpuAverage();
-
 function get_cpuusage () {
   var endMeasure = cpuAverage();
 
@@ -125,6 +125,11 @@ function get_cpuusage () {
 
   return percentageCPU;
 };
+
+
+setInterval(function(){
+  console.log('cpuusage: ' + get_cpuusage());
+},1000);
 
 setInterval(function (){
   process.nextTick((function(db_socket){
