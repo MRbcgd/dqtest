@@ -19,11 +19,11 @@ var mysql = require('mysql');
 // });
 
 var conn = mysql.createConnection({
-  host: 'localhost',
-  user: 'pchpch',
-  password: 'cs2017!Q@W#E$R',
-  database: 'server_monitoring',
-  multipleStatements: true
+    host: 'localhost',
+    user: 'pchpch',
+    password: 'cs2017!Q@W#E$R',
+    database: 'server_monitoring',
+    multipleStatements: true
 });
 
 conn.connect(function(err) {
