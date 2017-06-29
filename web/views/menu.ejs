@@ -1,31 +1,67 @@
+<!-- <ul class="navi" id="sidebar-nav">
 
-<ul id="sidebar-nav" >
-  <li><a href="/main" style="color:yellow">HOME</a></li>
-  <li><a href="/stat_info" style="color:white">System Information</a></li>
-  <li><a href="/usage_status" style="color:white">System Usage</a></li>
-  <ul>
-    <li><a href="/usage_status" style="color:white">Status</a></li>
-    <li><a href="/usage_cpu" style="color:white">CPU</a></li>
-    <ul>
-      <li><a href="/usage_cpu" style="color:white">CPU</a></li>
-      <li><a href="/stat_prcs" style="color:white">Processes</a></li>
-    </ul>
+    <li><a href="/stat_info" style="color:white">System Info</a></li>
+    <li><a href="/usage_status" style="color:white">System Usage</a></li>
+
+
+
     <li><a href="/usage_mem" style="color:white">Memory</a></li>
-    <li><a href="/usage_tcp" style="color:white">Network (TCP)</a></li>
-    <ul>
-      <li><a href="/usage_tcp" style="color:white">TCP</a></li>
-      <li><a href="/stat_net" style="color:white">Netstat</a></li>
-    </ul>
+    <li><a href="/usage_tcp" style="color:white">Network</a></li>
+        <ul>
+            <li><a href="/stat_net" style="color:white">Netstat</a></li>
+        </ul>
     <li><a href="#" style="color:white">IPCS</a></li>
-    <ul>
-      <li><a href="/stat_ipcq" style="color:white">Queue</a></li>
-      <li><a href="/stat_ipcm" style="color:white">SHM</a></li>
-    </ul>
+        <ul>
+            <li><a href="/stat_ipcq" style="color:white">Queue</a></li>
+            <li><a href="/stat_ipcm" style="color:white">SHM</a></li>
+        </ul>
     <li><a href="/usage_disk" style="color:white">Disk</a></li>
-    <ul>
-      <li><a href="/usage_disk" style="color:white">Disk</a></li>
-      <li><a href="/stat_disk" style="color:white">Filesystem</a></li>
+        <ul>
+            <li><a href="/stat_disk" style="color:white">Filesystem</a></li>
+        </ul>
+
+    <li><a href="/signout" style="color:yellow">SIGN OUT</a></li>
+</ul> -->
+<div class="btn-group-vertical" role="group" aria-label="...">
+  <button type="button" class="btn btn-default" onclick="location.href='/stat_info'">System Infomation</button>
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+      CPU
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+      <li><a href="/usage_cpu">Usage</a></li>
+      <li><a href="/stat_prcs">Processes</a></li>
     </ul>
-  </ul>
-  <li><a href="/signout" style="color:yellow">SIGN OUT</a></li>
-</ul>
+  </div><button type="button" class="btn btn-default" onclick="location.href='/usage_mem'">Memory</button>
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+      Network
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+      <li><a href="/usage_tcp">TCP</a></li>
+      <li><a href="/stat_net">Netstat</a></li>
+    </ul>
+  </div>
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+      IPCS
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+      <li><a href="/stat_ipcq">Queue</a></li>
+      <li><a href="/stat_ipcm">SHM</a></li>
+    </ul>
+  </div>
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+      Disk
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+      <li><a href="/usage_disk">Usage</a></li>
+      <li><a href="/stat_disk">Filesystem</a></li>
+    </ul>
+  </div>
+</div>

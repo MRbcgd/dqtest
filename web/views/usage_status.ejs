@@ -40,17 +40,21 @@
                 <div class="row">
                     <div class="col-md-12">
                         <a href="#" class="btn btn-primary" id="menu-toggle">Menu</a>
-                        <!-- top  -->
-                        <% include ./top.ejs %>
-                            <p>Usage status</p>
-                            <!--  -->
+                        <button type="button" class="btn btn-default btn" onclick="location.href='/main'">
+                        <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Main
+                    </button>
+                    <span class="title">&nbsp; Server Monitoring - Main</span>
+                        <!-- <strong>System Usage</strong> -->
+                        <!-- <% include ./top.ejs %> -->
+
+                        <!--  -->
                     </div>
 
-                    <div class="" align="center">
+                    <!-- <div class="" align="center">
                         <span class="label label-info">Primary</span>
                         <span class="label label-warning">Warning</span>
                         <span class="label label-danger">Danger</span>
-                    </div>
+                    </div> -->
                     <div class="chart-container">
                         <canvas id="myChart"></canvas>
                     </div>
@@ -118,8 +122,8 @@
                                         padding: {
                                             left: 0,
                                             right: 0,
-                                            top: 40,
-                                            bottom: 0
+                                            top: 0,
+                                            bottom: 100
                                         }
                                     },
                                     onClick: barClickEvent,
@@ -128,7 +132,8 @@
                                     },
                                     scales: {
                                         xAxes: [{
-                                            position: 'top'
+                                            position: 'top',
+
                                         }],
                                         yAxes: [{
                                             ticks: {

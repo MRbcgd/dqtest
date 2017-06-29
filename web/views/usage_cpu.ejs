@@ -40,13 +40,12 @@
         <div class="row">
           <div class="col-md-12">
             <a href="#" class="btn btn-primary" id="menu-toggle">Menu</a>
-            <!-- top  -->
-            <% include ./top.ejs %>
-              <p>CPU Usage</p>
+            <button type="button" class="btn btn-default btn" onclick="location.href='/main'">
+            <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Main
+            </button>
+            <span class="title">&nbsp; CPU - Usage</span>
+
               <!--  -->
-          </div>
-          <div class="" align="center">
-              <br><br><br>
           </div>
           <div class="chart-container">
             <canvas id="myChart"></canvas>
@@ -107,8 +106,8 @@
                       padding: {
                           left: 0,
                           right: 0,
-                          top: 40,
-                          bottom: 0
+                          top: 0,
+                          bottom: 100
                       }
                   },
                   title: {

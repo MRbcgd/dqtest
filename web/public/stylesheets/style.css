@@ -8,28 +8,32 @@
   width: 0;
   height: 100%;
   overflow-y: hidden;
-  background: #2c3e50;
+  /*background: #2c3e50;*/
 }
 /*/*/
 ul{
     list-style:none;
+    font-size: 20px;
 }
 ul :active {
   color:white;
+
 }
+
 /**/
 #page-content-wrapper {
-  width: 100%;
+  width:100%;
   position: absolute;
   padding: 15px;
 }
 
 #wrapper.menuDisplayed #sidebar-wrapper {
-  width: 250px;
+  width: 160px;
 }
 
 #wrapper.menuDisplayed .page-content-wrapper {
-  padding-left: 250px;
+  /*padding-left: 250px;*/
+  padding-left: 160px;
 
 }
 #wrapper .page-content-wrapper {
@@ -44,6 +48,17 @@ ul :active {
 .chart-container {
   position: relative;
   margin: auto;
-  height: 85vh;
-  width: 95vw;
+  top: 5vh;
+  height: 90vh;
+  /*width: 95vw;*/
+  width:95%;
+}
+
+.title {
+    font-family: "Franklin Gothic Medium", "Franklin Gothic", "ITC Franklin Gothic", Arial, sans-serif;
+	font-size: 24px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 500;
+	line-height: 26.4px;
 }
