@@ -2,171 +2,220 @@
 <html>
 
 <head>
-  <meta charset="UTF-8">
-  <title>Server Monitoring</title>
+    <meta charset="UTF-8">
+    <title>Server Monitoring</title>
 
-  <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
-  <link rel="stylesheet" href="stylesheets/style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
-  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-  <script src='/socket.io/socket.io.js'></script>
-  <script type="text/javascript">
-    var socket = io();
+    <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <script src='/socket.io/socket.io.js'></script>
+    <script type="text/javascript">
+        var socket = io();
 
-    socket.connect('http://localhost', {
-      'reconnection': true,
-      'reconnectionDelay': 500,
-      'reconnectionAttempts': 10
-    });
+        socket.connect('http://localhost', {
+            'reconnection': true,
+            'reconnectionDelay': 500,
+            'reconnectionAttempts': 10
+        });
 
-    socket.emit('clientQuery', 'agentcpu');
-    socket.on('serverSent', function(message) {
+        socket.emit('clientQuery', 'agentcpu');
+        socket.on('serverSent', function(message) {
 
-      drawChart(message);
-    });
-  </script>
+            drawChart(message);
+        });
+    </script>
 </head>
 
 <body>
-  <div id="wrapper">
-    <!-- Sidebar -->
-    <div id="sidebar-wrapper">
-      <% include ./menu.ejs%>
-    </div>
-    <!-- Page Content -->
-    <div class="page-content-wrapper">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-12">
-            <a href="#" class="btn btn-primary" id="menu-toggle">Menu</a>
-            <button type="button" class="btn btn-default btn" onclick="location.href='/main'">
-            <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Main
-            </button>
-            <span class="title">&nbsp; CPU - Usage</span>
+    <div id="wrapper">
 
-              <!--  -->
-          </div>
-          <div class="chart-container">
-            <canvas id="myChart"></canvas>
-          </div>
-          <script type="text/javascript">
-            function drawChart(message) {
-              var result = [];
-              // 2017-06-26 22
-              var past_data = message[0];
-              var last_data = message[1][0];
+        <div class="page-content-wrapper">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                          </button>
+                        <a class="navbar-brand" href="/main">Main</a>
+                    </div>
 
-              var time = utcToKst(last_data.idate);
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li>
+                                <a href="/stat_info">System Information</a>
+                            </li>
+                            <!-- <li><a href="#"></a></li> -->
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">CPU <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/usage_cpu">Usage</a></li>
+                                    <li><a href="/stat_prcs">Processes</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="/usage_mem">Memory</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Network<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/usage_tcp">TCP</a></li>
+                                    <li><a href="/stat_net">Netstat</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">IPCS<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/stat_ipcq">Queue</a></li>
+                                    <li><a href="/stat_ipcm">SHM</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Disk<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/usage_disk">Usage</a></li>
+                                    <li><a href="/stat_disk">Filesystem</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="/signout">Sign Out</a></li>
+                        </ul>
+                    </div>
+                    <!-- /.navbar-collapse -->
 
-              result.push({
-                x: time,
-                y: last_data.us,
-                prcs1_nm: last_data.prcs1_nm,
-                prcs2_nm: last_data.prcs2_nm,
-                prcs3_nm: last_data.prcs3_nm,
-                prcs1_us: last_data.prcs1_us,
-                prcs2_us: last_data.prcs2_us,
-                prcs3_us: last_data.prcs3_us
-              });
+                    <div class="row">
+                        <div class="col-md-12">
+                            <span class="title">&nbsp; CPU - Usage</span>
 
-              for (var i in past_data) {
-                var idate = past_data[i].idate;
-                var year = idate.substr(0, 4);
-                var month = (Number(idate.substr(5, 2)) - 1).toString();
-                var date = idate.substr(8, 2);
-                var hour = idate.substr(11, 2);
-                result.push({
-                  x: new Date(year, month, date, hour),
-                  y: past_data[i].us,
-                  prcs1_nm: past_data[i].prcs1_nm,
-                  prcs2_nm: past_data[i].prcs2_nm,
-                  prcs3_nm: past_data[i].prcs3_nm,
-                  prcs1_us: past_data[i].prcs1_us,
-                  prcs2_us: past_data[i].prcs2_us,
-                  prcs3_us: past_data[i].prcs3_us
-                });
-              };
+                            <!--  -->
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="myChart"></canvas>
+                        </div>
+                        <script type="text/javascript">
+                            function drawChart(message) {
+                                var result = [];
+                                // 2017-06-26 22
+                                var past_data = message[0];
+                                var last_data = message[1][0];
 
-              var ctx = $('#myChart');
-              var myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                  datasets: [{
-                    backgroundColor: 'rgba(54, 162, 235, 1)', //NO COLOR UNDER LINE
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    fill: false,
-                    data: result
-                  }]
-                },
-                options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  layout: {
-                      padding: {
-                          left: 0,
-                          right: 0,
-                          top: 0,
-                          bottom: 100
-                      }
-                  },
-                  title: {
-                    display: true,
-                    text: 'CPU Usage'
-                  },
-                  legend: {
-                    display: false
-                  },
-                  tooltips: {
-                    callbacks: {
-                      label: function(tooltipItem, data) {
-                        return 'CPU Usage: ' + tooltipItem.yLabel + '%';
-                      },
-                      afterLabel: function(tooltipItem, data) {
-                        var data = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                        var multistringText = [''];
+                                var time = utcToKst(last_data.idate);
 
-                        multistringText.push('Command  |  CPU(%)');
-                        multistringText.push('  ' + '1) ' + data.prcs1_nm + ': ' + data.prcs1_us + '%');
-                        multistringText.push('  ' + '2) ' + data.prcs2_nm + ': ' + data.prcs2_us + '%');
-                        multistringText.push('  ' + '3) ' + data.prcs3_nm + ': ' + data.prcs3_us + '%');
+                                result.push({
+                                    x: time,
+                                    y: last_data.us,
+                                    prcs1_nm: last_data.prcs1_nm,
+                                    prcs2_nm: last_data.prcs2_nm,
+                                    prcs3_nm: last_data.prcs3_nm,
+                                    prcs1_us: last_data.prcs1_us,
+                                    prcs2_us: last_data.prcs2_us,
+                                    prcs3_us: last_data.prcs3_us
+                                });
 
-                        return multistringText;
-                      }
-                    }
-                  },
-                  scales: {
-                    xAxes: [{
-                      type: 'time',
-                      time: {
-                        format: 'DD MMM'
-                      }
-                    }],
-                    yAxes: [{
-                      ticks: {
-                        min: 0,
-                        max: 100,
-                        beginAtZero: true
-                      }
-                    }]
-                  }
-                }
-              });
-            }
-          </script>
-          <!-- middle -->
-          <!--  -->
+                                for (var i in past_data) {
+                                    var idate = past_data[i].idate;
+                                    var year = idate.substr(0, 4);
+                                    var month = (Number(idate.substr(5, 2)) - 1).toString();
+                                    var date = idate.substr(8, 2);
+                                    var hour = idate.substr(11, 2);
+                                    result.push({
+                                        x: new Date(year, month, date, hour),
+                                        y: past_data[i].us,
+                                        prcs1_nm: past_data[i].prcs1_nm,
+                                        prcs2_nm: past_data[i].prcs2_nm,
+                                        prcs3_nm: past_data[i].prcs3_nm,
+                                        prcs1_us: past_data[i].prcs1_us,
+                                        prcs2_us: past_data[i].prcs2_us,
+                                        prcs3_us: past_data[i].prcs3_us
+                                    });
+                                };
+
+                                var ctx = $('#myChart');
+                                var myChart = new Chart(ctx, {
+                                    type: 'line',
+                                    data: {
+                                        datasets: [{
+                                            backgroundColor: 'rgba(54, 162, 235, 1)', //NO COLOR UNDER LINE
+                                            borderColor: 'rgba(54, 162, 235, 1)',
+                                            fill: false,
+                                            data: result
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        layout: {
+                                            padding: {
+                                                left: 0,
+                                                right: 0,
+                                                top: 0,
+                                                bottom: 100
+                                            }
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: 'CPU Usage'
+                                        },
+                                        legend: {
+                                            display: false
+                                        },
+                                        tooltips: {
+                                            callbacks: {
+                                                label: function(tooltipItem, data) {
+                                                    return 'CPU Usage: ' + tooltipItem.yLabel + '%';
+                                                },
+                                                afterLabel: function(tooltipItem, data) {
+                                                    var data = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                                                    var multistringText = [''];
+
+                                                    multistringText.push('Command  |  CPU(%)');
+                                                    multistringText.push('  ' + '1) ' + data.prcs1_nm + ': ' + data.prcs1_us + '%');
+                                                    multistringText.push('  ' + '2) ' + data.prcs2_nm + ': ' + data.prcs2_us + '%');
+                                                    multistringText.push('  ' + '3) ' + data.prcs3_nm + ': ' + data.prcs3_us + '%');
+
+                                                    return multistringText;
+                                                }
+                                            }
+                                        },
+                                        scales: {
+                                            xAxes: [{
+                                                type: 'time',
+                                                time: {
+                                                    format: 'DD MMM'
+                                                }
+                                            }],
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    max: 100,
+                                                    beginAtZero: true
+                                                }
+                                            }]
+                                        }
+                                    }
+                                });
+                            }
+                        </script>
+                        <!-- middle -->
+                        <!--  -->
+                    </div>
+
+                    <!-- bottom -->
+                    <!--  -->
+                </div>
+            </nav>
         </div>
 
-        <!-- bottom -->
-        <!--  -->
-      </div>
     </div>
-
-  </div>
-  <script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
-  <script src="javascripts/index.js"></script>
-  <script src="javascripts/timezone.js"></script>
+    <script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
+    <script src="javascripts/index.js"></script>
+    <script src="javascripts/timezone.js"></script>
 
 </body>
 

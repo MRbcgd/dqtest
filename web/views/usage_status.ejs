@@ -30,186 +30,245 @@
 
 <body>
     <div id="wrapper">
-        <!-- Sidebar -->
-        <div id="sidebar-wrapper">
-            <% include ./menu.ejs%>
-        </div>
-        <!-- Page Content -->
         <div class="page-content-wrapper">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-12">
-                        <a href="#" class="btn btn-primary" id="menu-toggle">Menu</a>
-                        <button type="button" class="btn btn-default btn" onclick="location.href='/main'">
-                        <span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Main
-                    </button>
-                    <span class="title">&nbsp; Server Monitoring - Main</span>
-                        <!-- <strong>System Usage</strong> -->
-                        <!-- <% include ./top.ejs %> -->
 
-                        <!--  -->
+
+
+            <nav class="navbar navbar-default">
+
+                <div class="container-fluid">
+
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                          </button>
+                        <a class="navbar-brand" href="/main">Main</a>
                     </div>
 
-                    <!-- <div class="" align="center">
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li>
+                                <a href="/stat_info">System Information</a>
+                            </li>
+                            <!-- <li><a href="#"></a></li> -->
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">CPU <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/usage_cpu">Usage</a></li>
+                                    <li><a href="/stat_prcs">Processes</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="/usage_mem">Memory</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Network<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/usage_tcp">TCP</a></li>
+                                    <li><a href="/stat_net">Netstat</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">IPCS<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/stat_ipcq">Queue</a></li>
+                                    <li><a href="/stat_ipcm">SHM</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Disk<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/usage_disk">Usage</a></li>
+                                    <li><a href="/stat_disk">Filesystem</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="/signout">Sign Out</a></li>
+                        </ul>
+                    </div>
+                    <!-- /.navbar-collapse -->
+
+
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <span class="title">&nbsp; Server Monitoring - Main</span>
+                            <!-- <strong>System Usage</strong> -->
+                            <!-- <% include ./top.ejs %> -->
+
+                            <!--  -->
+                        </div>
+
+                        <!-- <div class="" align="center">
                         <span class="label label-info">Primary</span>
                         <span class="label label-warning">Warning</span>
                         <span class="label label-danger">Danger</span>
                     </div> -->
-                    <div class="chart-container">
-                        <canvas id="myChart"></canvas>
-                    </div>
-                    <script type="text/javascript">
-                        function drawChart(message) {
-                            var cpup = message[0][0].cpup;
-                            var memp = message[1][0].memp;
-                            var netp = (message[2][0].rcv + message[2][0].snd) / mother;
-                            var diskp = message[3][0].diskp;
-                            var qnum = 0;
+                        <div class="chart-container">
+                            <canvas id="myChart"></canvas>
+                        </div>
+                        <script type="text/javascript">
+                            function drawChart(message) {
+                                var cpup = message[0][0].cpup;
+                                var memp = message[1][0].memp;
+                                var netp = (message[2][0].rcv + message[2][0].snd) / mother;
+                                var diskp = message[3][0].diskp;
+                                var qnum = 0;
 
-                            if (netp > 0 && netp < 1) {
-                                netp = 1;
+                                if (netp > 0 && netp < 1) {
+                                    netp = 1;
 
-                            };
-                            if (message[4][0] !== undefined) {
-                                qnum = message[4][0].qnum;
-                            };
+                                };
+                                if (message[4][0] !== undefined) {
+                                    qnum = message[4][0].qnum;
+                                };
 
-                            var warnColor = 'rgba(255, 0, 0, 1)';
-                            var careColor = 'rgba(255, 228, 0, 1)';
-                            var protectColor = 'rgba(54, 162, 235, 1)';
+                                var warnColor = 'rgba(255, 0, 0, 1)';
+                                var careColor = 'rgba(255, 228, 0, 1)';
+                                var protectColor = 'rgba(54, 162, 235, 1)';
 
-                            Chart.pluginService.register({ //PLUG IN
-                                beforeUpdate: function(chartInstance) {
-                                    chartInstance.data.datasets.forEach(function(dataset) {
-                                        dataset.backgroundColor = dataset.data.map(function(data, index) {
-                                            if (index === 4) { //qnum
-                                                if (data >= 10) return warnColor;
-                                                else return protectColor;
-                                            } else {
-                                                if (data >= 70) return warnColor;
-                                                else if (data >= 50 && data < 70) return careColor;
-                                                else return protectColor;
-                                            }
+                                Chart.pluginService.register({ //PLUG IN
+                                    beforeUpdate: function(chartInstance) {
+                                        chartInstance.data.datasets.forEach(function(dataset) {
+                                            dataset.backgroundColor = dataset.data.map(function(data, index) {
+                                                if (index === 4) { //qnum
+                                                    if (data >= 10) return warnColor;
+                                                    else return protectColor;
+                                                } else {
+                                                    if (data >= 70) return warnColor;
+                                                    else if (data >= 50 && data < 70) return careColor;
+                                                    else return protectColor;
+                                                }
+                                            })
                                         })
-                                    })
-                                }
-                            });
+                                    }
+                                });
 
-                            Chart.defaults.global.defaultFontSize = 15;
+                                Chart.defaults.global.defaultFontSize = 15;
 
-                            var ctx = $('#myChart');
-                            var myChart = new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: ["CPU", "MEMORY", "NETWORK", "DISK", "SysvIPC Count"],
-                                    datasets: [{
-                                        data: [cpup, memp, netp, diskp, qnum],
-                                        borderColor: [
-                                            'rgba(54, 162, 235, 1)',
-                                            'rgba(54, 162, 235, 1)',
-                                            'rgba(54, 162, 235, 1)',
-                                            'rgba(54, 162, 235, 1)',
-                                            'rgba(54, 162, 235, 1)',
-                                            'rgba(54, 162, 235, 1)'
-                                        ],
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    layout: {
-                                        padding: {
-                                            left: 0,
-                                            right: 0,
-                                            top: 0,
-                                            bottom: 100
-                                        }
-                                    },
-                                    onClick: barClickEvent,
-                                    legend: {
-                                        display: false
-                                    },
-                                    scales: {
-                                        xAxes: [{
-                                            position: 'top',
-
-                                        }],
-                                        yAxes: [{
-                                            ticks: {
-                                                min: 0,
-                                                max: 100,
-                                                beginAtZero: true
-                                            },
+                                var ctx = $('#myChart');
+                                var myChart = new Chart(ctx, {
+                                    type: 'bar',
+                                    data: {
+                                        labels: ["CPU", "MEMORY", "NETWORK", "DISK", "SysvIPC Count"],
+                                        datasets: [{
+                                            data: [cpup, memp, netp, diskp, qnum],
+                                            borderColor: [
+                                                'rgba(54, 162, 235, 1)',
+                                                'rgba(54, 162, 235, 1)',
+                                                'rgba(54, 162, 235, 1)',
+                                                'rgba(54, 162, 235, 1)',
+                                                'rgba(54, 162, 235, 1)',
+                                                'rgba(54, 162, 235, 1)'
+                                            ],
+                                            borderWidth: 1
                                         }]
                                     },
-                                    tooltips: {
-                                        enabled: true
-                                    },
-                                    hover: {
-                                        animationDuration: 0
-                                    },
-                                    animation: {
-                                        duration: 1,
-                                        onComplete: function() {
-                                            var chartInstance = this.chart,
-                                                ctx = chartInstance.ctx;
-                                            ctx.font = Chart.helpers.fontString(17, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
-                                            ctx.textAlign = 'center';
-                                            ctx.textBaseline = 'bottom';
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        layout: {
+                                            padding: {
+                                                left: 0,
+                                                right: 0,
+                                                top: 0,
+                                                bottom: 100
+                                            }
+                                        },
+                                        onClick: barClickEvent,
+                                        legend: {
+                                            display: false
+                                        },
+                                        scales: {
+                                            xAxes: [{
+                                                position: 'top',
 
-                                            this.data.datasets.forEach(function(dataset, i) {
-                                                var meta = chartInstance.controller.getDatasetMeta(i);
-                                                meta.data.forEach(function(bar, index) {
-                                                    var data = dataset.data[index];
-                                                    ctx.fillStyle = "#000000";
-                                                    if (index !== 4) { //qnum
-                                                        data += '%';
-                                                    }
-                                                    ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                                            }],
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    max: 100,
+                                                    beginAtZero: true
+                                                },
+                                            }]
+                                        },
+                                        tooltips: {
+                                            enabled: true
+                                        },
+                                        hover: {
+                                            animationDuration: 0
+                                        },
+                                        animation: {
+                                            duration: 1,
+                                            onComplete: function() {
+                                                var chartInstance = this.chart,
+                                                    ctx = chartInstance.ctx;
+                                                ctx.font = Chart.helpers.fontString(17, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                                                ctx.textAlign = 'center';
+                                                ctx.textBaseline = 'bottom';
+
+                                                this.data.datasets.forEach(function(dataset, i) {
+                                                    var meta = chartInstance.controller.getDatasetMeta(i);
+                                                    meta.data.forEach(function(bar, index) {
+                                                        var data = dataset.data[index];
+                                                        ctx.fillStyle = "#000000";
+                                                        if (index !== 4) { //qnum
+                                                            data += '%';
+                                                        }
+                                                        ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                                                    });
                                                 });
-                                            });
+                                            }
                                         }
                                     }
-                                }
-                            });
+                                });
 
-                            function barClickEvent(event, array) {
+                                function barClickEvent(event, array) {
 
-                                var activePoints = myChart.getElementsAtEvent(event);
+                                    var activePoints = myChart.getElementsAtEvent(event);
 
-                                switch (activePoints[0]._index) {
-                                    case 0:
-                                        window.location = '/usage_cpu';
-                                        break;
-                                    case 1:
-                                        window.location = '/usage_mem';
-                                        break;
-                                    case 2:
-                                        window.location = '/usage_tcp';
-                                        break;
-                                    case 3:
-                                        window.location = '/usage_disk';
-                                        break;
-                                    case 4:
-                                        window.location = '/stat_ipcq';
-                                        break;
-                                    default:
-                                        window.location = '/';
+                                    switch (activePoints[0]._index) {
+                                        case 0:
+                                            window.location = '/usage_cpu';
+                                            break;
+                                        case 1:
+                                            window.location = '/usage_mem';
+                                            break;
+                                        case 2:
+                                            window.location = '/usage_tcp';
+                                            break;
+                                        case 3:
+                                            window.location = '/usage_disk';
+                                            break;
+                                        case 4:
+                                            window.location = '/stat_ipcq';
+                                            break;
+                                        default:
+                                            window.location = '/';
+                                    }
                                 }
                             }
-                        }
-                    </script>
+                        </script>
 
-                    <!-- middle -->
+                        <!-- middle -->
 
+                        <!--  -->
+                    </div>
+
+                    <!-- bottom -->
                     <!--  -->
                 </div>
+            </nav>
 
-                <!-- bottom -->
-                <!--  -->
-            </div>
+
+            <!--  -->
         </div>
+
 
     </div>
     <script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
