@@ -1,103 +1,209 @@
 <!DOCTYPE html>
-<html >
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>Server Monitoring</title>
+    <meta charset="UTF-8">
+    <title>Server Monitoring</title>
 
 
-  <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
-  <link rel="stylesheet" href="stylesheets/style.css">
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src='/socket.io/socket.io.js'></script>
-  <script type="text/javascript">
-  google.charts.load('current', {'callback': init, 'packages':['annotationchart']});
-  google.charts.setOnLoadCallback(drawChart);
+    <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <script src='/socket.io/socket.io.js'></script>
+    <script type="text/javascript">
+        var socket = io();
 
-function init () {
-  var socket = io.connect();
+        socket.connect('http://localhost', {
+            'reconnection': true,
+            'reconnectionDelay': 500,
+            'reconnectionAttempts': 10
+        });
 
-  // socket.emit('join','stat_prcs');
-  socket.emit('clientQuery','agentmemory');
-  socket.on('serverSent', function (message) {
-    // alert(JSON.stringify(message));
-    // var processData = processData(message);
-    drawChart(message);
-  });
-}
-function drawChart(message) {
-  var us,swap;
+        socket.emit('clientQuery', 'agentmemory');
+        socket.on('serverSent', function(message) {
 
-  var result = [];
-  var arr = [];
-
-  for (var i = 0; i < message.length; i++) {
-    var time = utcToKst(message[i].idate);
-
-    us = message[i].us;
-    swap = message[i].swap;
-
-    arr=[time, us,undefined,undefined,swap,undefined,undefined];
-    result.push(arr);
-  }
-
-  var data = new google.visualization.DataTable();
-
-  data.addColumn('date', 'Date');
-  data.addColumn('number', 'Memory Usage');
-  data.addColumn('string', 'memory title');
-  data.addColumn('string', 'memory text');
-  data.addColumn('number', 'Swap');
-  data.addColumn('string', 'swap title');
-  data.addColumn('string', 'swap text');
-
-
-  data.addRows(result);
-
-  var chart = new google.visualization.AnnotationChart(document.getElementById('chart_div'));
-
-  var options = {
-    displayAnnotations: true
-  };
-
-  chart.draw(data, options);
-}
-  </script>
+            drawChart(message);
+        });
+    </script>
 </head>
 
 <body>
-  <div id="wrapper" >
-  <!-- Sidebar -->
-  <div id="sidebar-wrapper">
-    <% include ./menu.ejs%>
-  </div>
-  <!-- Page Content -->
-  <div class="page-content-wrapper">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-12">
-          <a href="#" class="btn btn-primary" id="menu-toggle">Menu</a>
-          <!-- top  -->
-          <% include ./top.ejs %>
-          <p>Memory</p>
-          <!--  -->
+    <div id="wrapper">
+        <div class="page-content-wrapper">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+                        <a class="navbar-brand" href="/main">Main</a>
+                    </div>
+
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li>
+                                <a href="/stat_info">System Information</a>
+                            </li>
+                            <!-- <li><a href="#"></a></li> -->
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">CPU <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/usage_cpu">Usage</a></li>
+                                    <li><a href="/stat_prcs">Processes</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="/usage_mem">Memory</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Network<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/usage_tcp">TCP</a></li>
+                                    <li><a href="/stat_net">Netstat</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">IPCS<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/stat_ipcq">Queue</a></li>
+                                    <li><a href="/stat_ipcm">SHM</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Disk<span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/usage_disk">Usage</a></li>
+                                    <li><a href="/stat_disk">Filesystem</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="/signout">Sign Out</a></li>
+                        </ul>
+                    </div>
+                    <!-- /.navbar-collapse -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <span class="title">&nbsp; Memory</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="myChart"></canvas>
+                        </div>
+                        <script type="text/javascript">
+                            function drawChart(message) {
+                                var mem_us = [];
+                                var swap_us = [];
+                                // 2017-06-26 22
+                                var past_data = message[0];
+                                var last_data = message[1][0];
+
+                                var time = utcToKst(last_data.idate);
+
+                                mem_us.push({
+                                    x: time,
+                                    y: last_data.us
+                                });
+                                swap_us.push({
+                                    x: time,
+                                    y: last_data.swap
+                                });
+
+                                for (var i in past_data) {
+                                    var idate = past_data[i].idate;
+                                    var year = idate.substr(0, 4);
+                                    var month = (Number(idate.substr(5, 2)) - 1).toString();
+                                    var date = idate.substr(8, 2);
+                                    var hour = idate.substr(11, 2);
+                                    mem_us.push({
+                                        x: new Date(year, month, date, hour),
+                                        y: past_data[i].us,
+                                    });
+                                    swap_us.push({
+                                        x: new Date(year, month, date, hour),
+                                        y: past_data[i].swap
+                                    });
+                                };
+
+                                var ctx = $('#myChart');
+                                var myChart = new Chart(ctx, {
+                                    type: 'line',
+                                    data: {
+                                        datasets: [{
+                                                label: 'Memory Usage (%)',
+                                                backgroundColor: 'rgba(54, 162, 235, 1)', //NO COLOR UNDER LINE
+                                                borderColor: 'rgba(54, 162, 235, 1)',
+                                                fill: false,
+                                                data: mem_us
+                                            },
+                                            {
+                                                label: 'Swap Usage (%)',
+                                                backgroundColor: 'rgba(255, 99, 132, 1)', //NO COLOR UNDER LINE
+                                                borderColor: 'rgba(255, 99, 132, 1)',
+                                                fill: false,
+                                                data: swap_us
+                                            }
+                                        ]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        layout: {
+                                            padding: {
+                                                left: 0,
+                                                right: 0,
+                                                top: 0,
+                                                bottom: 100
+                                            }
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: 'Memory Usage'
+                                        },
+                                        legend: {
+                                            display: true
+                                        },
+                                        scales: {
+                                            xAxes: [{
+                                                display: true,
+                                                type: 'time',
+                                                time: {
+                                                    format: 'DD MMM'
+                                                }
+                                            }],
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    max: 100,
+                                                    beginAtZero: true
+                                                }
+                                            }]
+                                        }
+                                    }
+                                });
+                            }
+                        </script>
+                        <!-- middle -->
+                        <!--  -->
+                    </div>
+
+                    <!-- bottom -->
+                    <!--  -->
+                </div>
+            </nav>
         </div>
-        <!-- middle -->
-        <!--  -->
-      </div>
 
-      <div id="chart_div" style='width: 900px; height: 500px;'></div>
+    </div><script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
 
-      <!-- bottom -->
-      <!--  -->
-    </div>
-  </div>
-
-</div>
-<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-<script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
-
-<script src="javascripts/index.js"></script>
-<script src="javascripts/timezone.js"></script>
+    <script src="javascripts/index.js"></script>
+    <script src="javascripts/timezone.js"></script>
 
 </body>
+
 </html>
