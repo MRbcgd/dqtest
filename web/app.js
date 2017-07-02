@@ -157,7 +157,7 @@ io.on("connection", function(socket) {
       })
   } else if (data === 'agentmemory') {
       var sql = 'select t1.a idate, t1.b us, t1.c swap from (select substr(idate,1,13) a, max(us) b, max(swap) c, max(idate) d from agentmemory group by substr(idate,1,13) order by substr(idate,1,13) desc) t1 left outer join agentmemory t2 on t1.d=t2.idate order by t1.a desc limit 24;';
-      //LAST CPU DATA
+      //LAST MEMORY DATA
       var sql = sql += 'select * from agentmemory order by idate desc limit 1;';
       conn.query(sql, function(err, result) {
         if (err) {
@@ -169,7 +169,22 @@ io.on("connection", function(socket) {
         console.log('DB QUERY')
         // console.log(result);
       })
-  } else {
+  } else if (data === 'agentdisk') {
+      var sql = 'select t1.a idate, t1.b us from (select substr(idate,1,13) a, max(us) b, max(idate) c from agentdisk group by substr(idate,1,13) order by substr(idate,1,13) desc) t1 left outer join agentdisk t2 on t1.c = t2.idate order by t1.a desc limit 24;';
+      //LAST DISK DATA
+      var sql = sql += 'select * from agentdisk order by idate desc limit 1;';
+      conn.query(sql, function(err, result) {
+        if (err) {
+          throw err;
+        }
+
+        io.sockets.emit('serverSent', result);
+        console.log('####################');
+        console.log('DB QUERY')
+        // console.log(result);
+      })
+  }
+  else {
       var sql = 'SELECT * FROM ' + data + ' WHERE svrkey = ?;';
       conn.query(sql, [dstkey], function(err, result) {
         if (err) {
