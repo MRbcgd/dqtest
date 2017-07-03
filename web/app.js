@@ -8,7 +8,7 @@ var session = require('express-session');
 var socketio = require('socket.io'); //CONNECT WITH CLIENT
 var mysql = require('mysql');
 
-/*var conn = mysql.createConnection({
+var conn = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
@@ -16,8 +16,8 @@ var mysql = require('mysql');
     database: 'server_monitoring',
     multipleStatements: true
 });
-*/
 
+/*
 var conn = mysql.createConnection({
     host: 'localhost',
     user: 'pchpch',
@@ -25,7 +25,7 @@ var conn = mysql.createConnection({
     database: 'server_monitoring',
     multipleStatements: true
 });
-
+*/
 conn.connect(function(err) {
   if (err) {
     console.error('error connecting: ' + err.stack);
@@ -130,17 +130,25 @@ io.on("connection", function(socket) {
         console.log('DB QUERY')
       });
     } else if (data === 'agenttcp') {
-      var sql = 'SELECT A.svrkey, A.idate, A.eth, A.rcv, A.snd, B.eth eth_v, B.rcv v_rcv, B.snd v_snd FROM agenttcp A LEFT OUTER JOIN agenttcp AS B ON A.idate = B.idate WHERE A.eth = ? AND A.eth <> B.eth AND A.svrkey = ?';
-      conn.query(sql, ['enp2s0', dstkey], function(err, result) {
-        if (err) {
-          throw err;
-        }
+        /*
+        limit의 개수는 /proc/net/dev의 이더넷 개수를 config폴더에 저장한뒤 이를 이용하여 n*24로 구한다.
+        후에 수정한다.(임시)
+        */
+        var sql = 'select count(*) count from (select eth from agenttcp group by eth) t1;';
+        sql += 'select eth from agenttcp group by eth;';
+        sql += 'select t1.a idate, t1.b rcv, t1.c snd, t1.e eth from (select substr(idate,1,13) a, max(rcv) b, max(snd) c, max(idate) d, eth e from agenttcp group by substr(idate,1,13),eth order by substr(idate,1,13) desc) t1 left outer join agenttcp t2 on t1.d=t2.idate and t1.e=t2.eth order by t1.a desc limit 48;';
+        //LAST MEMORY DATA
+        sql += 'select * from agenttcp order by idate desc limit 2;';
+        conn.query(sql, function(err, result) {
+          if (err) {
+            throw err;
+          }
 
-        io.sockets.emit('serverSent', result);
-        console.log('####################');
-        console.log('DB QUERY')
-        // console.log(result);
-      })
+          io.sockets.emit('serverSent', result);
+          console.log('####################');
+          console.log('DB QUERY')
+          // console.log(result);
+        })
     } else if (data === 'agentcpu') {
       var sql = 'select t1.a idate, t1.b us, t2.prcs1_nm, t2.prcs1_us, t2.prcs2_nm, t2.prcs2_us, t2.prcs3_nm, t2.prcs3_us from (select substr(idate,1,13) a, max(us) b, max(idate) c from agentcpu group by substr(idate,1,13) order by substr(idate,1,13) desc) t1 left outer join agentcpu t2 on t1.c=t2.idate order by t1.a desc limit 24;';
       //LAST CPU DATA

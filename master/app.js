@@ -15,7 +15,7 @@ const dstkey = 'a52ER2###@DFDDQQ$FBPF!#)';
 const svrkey = 'a52ER2###@DFDDQQ$FBPF!#)';
 const login_token = 'login1';
 
-
+/*
 var conn = mysql.createConnection({
 	 host: 'localhost',
 	 user: 'pchpch',
@@ -23,15 +23,15 @@ var conn = mysql.createConnection({
 	 database: 'server_monitoring',
 	 multipleStatements: true
 });
-
-// var conn = mysql.createConnection({
-//         host: 'localhost',
-//         port: 3306,
-//         user: 'root',
-//         password: 'qkrcjfgud12',
-//         database: 'server_monitoring',
-//         multipleStatements: true
-// });
+*/
+var conn = mysql.createConnection({
+        host: 'localhost',
+        port: 3306,
+        user: 'root',
+        password: 'qkrcjfgud12',
+        database: 'server_monitoring',
+        multipleStatements: true
+});
 
 conn.connect(function(err) {
 	if (err) {
@@ -113,8 +113,8 @@ io.sockets.on('connection', function(socket) {
 		if ( message.head.svrkey === svrkey) {
 			//CPU - CPU
 			if ( message.head.svccd === 'stat_prcs') {
-				var sql = 
-				"INSERT INTO agentcpu (" + 
+				var sql =
+				"INSERT INTO agentcpu (" +
 					"svrkey, " +
 					"idate, " +
 					"us, " +
