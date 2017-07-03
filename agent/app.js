@@ -15,9 +15,6 @@ var func_query = require('./func_query');//DB QUERY, DIRECT QUERY
 func_socket.conn_socket(socket);
 func_socket.ip_check(socket);
 
-func_query.usage_tcp(function(result){
-    console.log(result);
-});
 
 //DIRECT QUERY
 //#########################################################################################################
@@ -196,38 +193,48 @@ setInterval(function (){
 
           packet.head.svccd = 'usage_tcp'; packet.head.query_type = 'db';packet.head.svrkey = session.svrkey;
 
-
-            if ( result['ens33'] ) {//TEST
-              packet.output.tcp = {
-                date : func_query.getWorldTime(+9),//KST
-                eth: 'ens33',
-                rcv: Number(result['ens33'].bytes.receive),
-                snd: Number(result['ens33'].bytes.transmit)
-              };
-              console.log('####################'); console.log('Send packet to master'); console.log(packet);
-              db_socket.emit('db_query', packet);
-            };
-            if (result['enp2s0']) {
-              packet.output.tcp = {
-                date : func_query.getWorldTime(+9),//KST
-                eth: 'enp2s0',
-                rcv: Number(result['enp2s0'].bytes.receive),
-                snd: Number(result['enp2s0'].bytes.transmit)
-              };
-              console.log('####################'); console.log('Send packet to master'); console.log(packet);
-              db_socket.emit('db_query', packet);
-            };
-            if (result['virbr0-nic']) {
-              packet.output.tcp = {
-                date : func_query.getWorldTime(+9),//KST
-                eth: 'virbr0-nic',
-                rcv: Number(result['virbr0-nic'].bytes.receive),
-                snd: Number(result['virbr0-nic'].bytes.transmit)
-              };
-
-              console.log('####################'); console.log('Send packet to master'); console.log(packet);
-              db_socket.emit('db_query', packet);
+            var keys = Object.keys(result);
+            for(var i in keys) {
+                packet.output.tcp = {
+                    date : func_query.getWorldTime(+9),//KST
+                    eth: keys[i],
+                    rcv: Number(result[keys[i]].bytes.receive),
+                    snd: Number(result[keys[i]].bytes.transmit)
+                  };
+                console.log('####################'); console.log('Send packet to master'); console.log(packet);
+                db_socket.emit('db_query', packet);
             }
+            // if ( result['ens33'] ) {//TEST
+            //   packet.output.tcp = {
+            //     date : func_query.getWorldTime(+9),//KST
+            //     eth: 'ens33',
+            //     rcv: Number(result['ens33'].bytes.receive),
+            //     snd: Number(result['ens33'].bytes.transmit)
+            //   };
+            //   console.log('####################'); console.log('Send packet to master'); console.log(packet);
+            //   db_socket.emit('db_query', packet);
+            // };
+            // if (result['enp2s0']) {
+            //   packet.output.tcp = {
+            //     date : func_query.getWorldTime(+9),//KST
+            //     eth: 'enp2s0',
+            //     rcv: Number(result['enp2s0'].bytes.receive),
+            //     snd: Number(result['enp2s0'].bytes.transmit)
+            //   };
+            //   console.log('####################'); console.log('Send packet to master'); console.log(packet);
+            //   db_socket.emit('db_query', packet);
+            // };
+            // if (result['virbr0-nic']) {
+            //   packet.output.tcp = {
+            //     date : func_query.getWorldTime(+9),//KST
+            //     eth: 'virbr0-nic',
+            //     rcv: Number(result['virbr0-nic'].bytes.receive),
+            //     snd: Number(result['virbr0-nic'].bytes.transmit)
+            //   };
+            //
+            //   console.log('####################'); console.log('Send packet to master'); console.log(packet);
+            //   db_socket.emit('db_query', packet);
+            // }
 
         });
 
@@ -289,7 +296,7 @@ setInterval(function (){
       }
     }
   })(socket))
-},60000);
+},1000);
 
 socket.on('db_query_result', function (message) {
   console.log('####################'); console.log('Receive packet from master'); console.log(message);
