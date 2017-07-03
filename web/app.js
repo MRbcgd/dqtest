@@ -8,8 +8,7 @@ var session = require('express-session');
 var socketio = require('socket.io'); //CONNECT WITH CLIENT
 var mysql = require('mysql');
 
-/*
-var conn = mysql.createConnection({
+/*var conn = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
@@ -18,6 +17,7 @@ var conn = mysql.createConnection({
     multipleStatements: true
 });
 */
+
 var conn = mysql.createConnection({
     host: 'localhost',
     user: 'pchpch',
