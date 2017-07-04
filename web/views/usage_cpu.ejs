@@ -42,6 +42,9 @@
                             <span class="icon-bar"></span>
                           </button>
                         <a class="navbar-brand" href="/main">Main</a>
+                        <a class="navbar-brand" href="/usage_cpu">CPU - Usage</a>
+                        <span class="navbar-brand"></span>
+                        <span class="navbar-brand"></span>
                     </div>
 
                     <!-- Collect the nav links, forms, and other content for toggling -->
@@ -90,9 +93,9 @@
                     <!-- /.navbar-collapse -->
 
                     <div class="row">
-                        <div class="col-md-12">
+                        <!-- <div class="col-md-12">
                             <span class="title">&nbsp; CPU - Usage</span>
-                        </div>
+                        </div> -->
                         <div class="chart-container">
                             <canvas id="myChart"></canvas>
                         </div>
@@ -115,7 +118,6 @@
                                     prcs2_us: last_data.prcs2_us,
                                     prcs3_us: last_data.prcs3_us
                                 });
-                                alert(result[0].x)
                                 for (var i in past_data) {
                                     var idate = past_data[i].idate;
                                     var year = idate.substr(0, 4);

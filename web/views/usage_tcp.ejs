@@ -97,48 +97,66 @@
                             <canvas id="myChart"></canvas>
                         </div>
                         <script type="text/javascript">
+                            const randomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+                            const randomByte = () => randomNumber(0, 255)
+                            const randomPercent = () => (randomNumber(50, 100) * 0.01).toFixed(2)
+                            const randomCssRgba = () => `rgba(${[randomByte(), randomByte(), randomByte(), randomPercent()].join(',')})`
+
                             function drawChart(test) {
                                 var result = [];
 
-                                var count = test[0][0].count;//이더넷 수
+                                var count = test[0][0].count; //이더넷 수
                                 var eth = [];
                                 //이더넷 마다 rcv, snd 변수 생성
                                 for (var i = 0; i < test[1].length; i++) {
-                                    eth.push(test[1][i].eth);
-                                    eval("var rcv_" + test[1][i].eth + "= [];");
-                                    eval("var snd_" + test[1][i].eth + "= [];");
+                                    var item = test[1][i].eth;
+                                    item = item.replace('-', '_');
+                                    eth.push(item);
+                                    eval("var rcv_" + item + "= [];");
+                                    eval("var snd_" + item + "= [];");
+                                    var rcv_color = randomCssRgba();
+                                    var snd_color = randomCssRgba();
                                     //rcv,snd dataset 마다 라인 생성
                                     result.push({
-                                        label: "rcv_"+test[1][i].eth,
-                                        backgroundColor: 'rgba(54, 162, 235, 1)', //NO COLOR UNDER LINE
-                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        label: "rcv_" + item,
+                                        backgroundColor: rcv_color, //NO COLOR UNDER LINE
+                                        borderColor: rcv_color,
                                         fill: false
                                     });
                                     result.push({
-                                        label: "snd_"+test[1][i].eth,
-                                        backgroundColor: 'rgba(54, 162, 235, 1)', //NO COLOR UNDER LINE
-                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        label: "snd_" + item,
+                                        backgroundColor: snd_color, //NO COLOR UNDER LINE
+                                        borderColor: snd_color,
                                         fill: false
                                     });
                                 };
                                 //가장 최근 데이터 호출
                                 for (var i = 0; i < test[3].length; i++) {
                                     var time = utcToKst(test[3][i].idate);
+                                    var item = test[3][i].eth;
+                                    var rcv = bitToMb(test[3][i].rcv);
+                                    var snd = bitToMb(test[3][i].snd);
 
-                                    eval("rcv_" + test[3][i].eth + ".push({x:time,y:test[3][i].rcv});");
-                                    eval("snd_" + test[3][i].eth + ".push({x:time,y:test[3][i].snd});");
+                                    item = item.replace('-', '_');
+                                    eval("rcv_" + item + ".push({x:time,y:rcv});");
+                                    eval("snd_" + item + ".push({x:time,y:snd});");
                                 };
                                 //과거 데이터 호출
                                 for (var i = 0; i < test[2].length; i++) {
                                     eth.filter(function(item) {
-                                        if (item === test[2][i].eth) {
+                                        var eth_item = test[2][i].eth;
+                                        eth_item = eth_item.replace('-', '_');
+                                        if (item === eth_item) {
                                             var idate = test[2][i].idate;
                                             var year = idate.substr(0, 4);
                                             var month = (Number(idate.substr(5, 2)) - 1).toString();
                                             var date = idate.substr(8, 2);
                                             var hour = idate.substr(11, 2);
-                                            eval("rcv_" + item + ".push({ x: new Date(year, month, date, hour),y: test[2][i].rcv});");
-                                            eval("snd_" + item + ".push({ x: new Date(year, month, date, hour),y: test[2][i].snd});");
+                                            var rcv = bitToMb(test[2][i].rcv);
+                                            var snd = bitToMb(test[2][i].snd);
+
+                                            eval("rcv_" + eth_item + ".push({ x: new Date(year, month, date, hour),y: rcv});");
+                                            eval("snd_" + eth_item + ".push({ x: new Date(year, month, date, hour),y: snd});");
                                         }
                                     });
                                 }
@@ -157,6 +175,13 @@
                                         datasets: result
                                     },
                                     options: {
+                                        tooltips: {
+                                            callbacks: {
+                                                label: function(tooltipItem, data) {
+                                                    return  data.datasets[tooltipItem.datasetIndex].label + ': ' + tooltipItem.yLabel + 'Mb';
+                                                }
+                                            }
+                                        },
                                         responsive: true,
                                         maintainAspectRatio: false,
                                         layout: {
@@ -169,7 +194,7 @@
                                         },
                                         title: {
                                             display: true,
-                                            text: 'Memory Usage'
+                                            text: 'Network Usage(MB)'
                                         },
                                         legend: {
                                             display: true
@@ -185,10 +210,12 @@
                                             yAxes: [{
                                                 ticks: {
                                                     min: 0,
-                                                    // max: 5000000000,
-                                                    max:500000000,
-
+                                                    max: 500,
                                                     beginAtZero: true
+                                                },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: 'MB'
                                                 }
                                             }]
                                         }
@@ -211,6 +238,7 @@
 
     <script src="javascripts/index.js"></script>
     <script src="javascripts/timezone.js"></script>
+    <script src="javascripts/math.js"></script>
 
 </body>
 

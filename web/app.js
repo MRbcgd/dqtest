@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var socketio = require('socket.io'); //CONNECT WITH CLIENT
 var mysql = require('mysql');
-
+/*
 var conn = mysql.createConnection({
     host: 'localhost',
     port: 3306,
@@ -16,8 +16,8 @@ var conn = mysql.createConnection({
     database: 'server_monitoring',
     multipleStatements: true
 });
+*/
 
-/*
 var conn = mysql.createConnection({
     host: 'localhost',
     user: 'pchpch',
@@ -25,7 +25,6 @@ var conn = mysql.createConnection({
     database: 'server_monitoring',
     multipleStatements: true
 });
-*/
 conn.connect(function(err) {
   if (err) {
     console.error('error connecting: ' + err.stack);
